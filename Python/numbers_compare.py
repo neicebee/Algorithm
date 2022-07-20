@@ -1,0 +1,27 @@
+'''
+Q. 두 정수 A와 B가 주어졌을 때, A와 B를 비교하는 프로그램을 작성하시오.
+Input. 첫째 줄에 A와 B가 주어진다. A와 B는 공백 한 칸으로 구분되어져 있다.
+Output. 첫째 줄에 다음 세 가지 중 하나를 출력한다.
+    A가 B보다 큰 경우에는 '>'를 출력한다.
+    A가 B보다 작은 경우에는 '<'를 출력한다.
+    A와 B가 같은 경우에는 '=='를 출력한다.
+Limit. -10,000 ≤ A, B ≤ 10,000
+'''
+
+# 빠른입력받기 => 블로그 포스팅하기
+import sys
+a, b = map(int, sys.stdin.readline().rstrip().split())
+print(a, "%", b)
+
+# rstrip(): sys.stdin.readline() 뒤의 개행문자 제거
+
+'''
+a, b = map(int, input().split())
+
+if a > b:
+    print(">")
+elif a < b:
+    print("<")
+else:
+    print("==")
+'''
