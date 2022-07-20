@@ -22,9 +22,9 @@ print("강한친구 대한육군")
     강한친구 대한육군
 
 
-![print_code](/Users/f1r3_r41n/Desktop/Algorithm/Python/Photo/wlk_print_code.png)
+![print_code](https://github.com/neicebee/Algorithm/blob/main/Python/Photo/wlk_print_code.png)
 
-![print_result](/Users/f1r3_r41n/Desktop/Algorithm/Python/Photo/wlk_print_result.png)
+![print_result](https://github.com/neicebee/Algorithm/blob/main/Python/Photo/wlk_print_result.png)
 
 `time.process_time_ns()`를 사용하여 보는 코드의 시간은 14000ns에서 21000ns 사이
 
@@ -38,9 +38,9 @@ for i in range(0, 2):
     강한친구 대한육군
 
 
-![for_code](/Users/f1r3_r41n/Desktop/Algorithm/Python/Photo/wlk_for_code.png)
+![for_code](https://github.com/neicebee/Algorithm/blob/main/Python/Photo/wlk_for_code.png)
 
-![for_result](/Users/f1r3_r41n/Desktop/Algorithm/Python/Photo/wlk_for_result.png)
+![for_result](https://github.com/neicebee/Algorithm/blob/main/Python/Photo/wlk_for_result.png)
 
 for문을 사용한 코드는 16000ns에서 25000ns 사이로 나온다.
 
