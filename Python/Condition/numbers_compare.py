@@ -8,11 +8,15 @@ Output. 첫째 줄에 다음 세 가지 중 하나를 출력한다.
 Limit. -10,000 ≤ A, B ≤ 10,000
 '''
 
-# 빠른입력받기 => 블로그 포스팅하기
 import sys
 a, b = map(int, sys.stdin.readline().rstrip().split())
-print(a, "%", b)
 
+if a > b:
+    print(">")
+elif a < b:
+    print("<")
+else:
+    print("==")
 # rstrip(): sys.stdin.readline() 뒤의 개행문자 제거
 
 '''
