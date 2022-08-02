@@ -6,7 +6,7 @@ Input. 첫 줄에는 정수 x가 주어진다. (−1000 ≤ x ≤ 1000; x ≠ 0)
 Output. 점 (x, y)의 사분면 번호(1, 2, 3, 4 중 하나)를 출력한다.
 '''
 
-a = int(input())
+""" a = int(input())
 b = int(input())
 
 if a>0 and b>0:
@@ -16,4 +16,6 @@ elif a<0 and b>0:
 elif a<0 and b<0:
     print(3)
 else:
-    print(4)
+    print(4) """
+
+print("3421"[input()>"0"::2][input()>"0"])

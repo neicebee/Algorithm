@@ -10,26 +10,8 @@ Output. 첫째 줄에 종료되는 시각의 시와 분을 공백을 사이에 �
 (단, 시는 0부터 23까지의 정수, 분은 0부터 59까지의 정수이다. 디지털 시계는 23시 59분에서 1분이 지나면 0시 0분이 된다.)
 '''
 
-""" A, B = map(int, input().split())
-C = int(input())
-
-if B+C>=60:
-    hour = (B+C)//60
-    minute = (B+C)%60
-    if A+hour>23:
-        A=(A+hour)-24
-    else:
-        A = A+hour
-    print(A, minute)
-else:
-    print(A, B+C) """
-
-""" import sys
-A, B = map(int, sys.stdin.readline().rstrip().split())
-print(A, B) """
-
-A, B, C= map(int, open(0).read().split())
-print(A, B, C)
+A, B, C = map(int, open(0).read().split())
+print((A+(B+C)//60)%24, (B+C)%60)
 
 '''
 readline(): 파일의 한 줄을 가져와 문자열로 반환. 파일 포인터는 다음 줄로 이동
