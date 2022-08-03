@@ -114,3 +114,5 @@ print((A+(B+C)//60)%24, (B+C)%60)
 
 [open(0)과 sys.stdin의 설명 보러가기](https://it-neicebee.tistory.com/118)
 
+## ⚙️ Three Dices
+
