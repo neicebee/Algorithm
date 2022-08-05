@@ -11,7 +11,7 @@ Input. 첫째 줄에 3개의 눈이 빈칸을 사이에 두고 각각 주어진�
 Output. 첫째 줄에 게임의 상금을 출력 한다.
 '''
 
-a, b, c = map(int, open(0).read().split())
+""" a, b, c = map(int, open(0).read().split())
 
 if a==b and b==c and a==c:
     print(f'{10000+a*1000}')
@@ -22,4 +22,7 @@ elif b==c and a!=b and a!=c:
 elif a==c and a!=b and b!=c:
     print(f'{1000+a*100}')
 else:
-    print(f'{max(a,b,c)*100}')
+    print(f'{max(a,b,c)*100}') """
+
+*_, a, b, c = sorted(input())
+print(['1'+b, c][a<b<c]+'000'[a<c:])
