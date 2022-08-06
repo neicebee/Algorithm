@@ -1,3 +1,5 @@
+mod print_and_cal;
+
 fn main() {
-    println!("Hello, world!");
+    print_and_cal::we_love_kriii();
 }
