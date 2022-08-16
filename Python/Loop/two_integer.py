@@ -13,3 +13,4 @@ Output. 각 테스트 케이스마다 A+B를 출력한다.
 #     print(A+B)
 #     cnt+=1
 
+T = int(input()); exec("print(eval('+'.join(input())));"*T)

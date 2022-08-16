@@ -7,5 +7,5 @@ Output. 출력형식과 같게 N*1부터 N*9까지 출력한다.
 # N = int(input())
 # for i in range(1,10): print(f'{N} * {i} = {N*i}')
 
-a=b=int(input())
-print(a, b)
+N=n=int(input())
+exec("print(N, '*', n//N, '=', n); n+=N;"*9)
