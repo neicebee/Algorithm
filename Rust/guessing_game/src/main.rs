@@ -1,13 +1,16 @@
 use std::io;
+use rand::Rng;
 
-fn main() {
-    println!("랜덤 숫자를 맞혀보세요!");
-    println!("예상 숫자를 입력하세요.");
+fn main(){
+    println!("Guess the number!");
 
+    let secret_number = rand::thread_rng().gen_range(1, 101);
+    println!("The number of player must guess: {}", secret_number);
+    println!("The number of player thinks.");
+    
     let mut guess = String::new();
-
     io::stdin().read_line(&mut guess)
-        .expect("입력한 값을 읽지 못했습니다.");
+        .expect("Unable to read input!");
 
-    println!("입력한 값: {}", guess);
+    println!("Input Number: {}", guess);
 }
