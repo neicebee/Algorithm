@@ -140,3 +140,52 @@ for n in [*sys.stdin][1:]:
 ```
 - sys를 사용하지 않고 open(0) 객체를 사용해도 괜찮은 것 같다. 반복해서 파일을 여는 것이 아니기 때문에 파일 객체를 닫아야 한다는 필수 조건도 피할 수 있어보임
 
+## ⚙️ Sum 2
+
+>Q. 두 정수 A와 B를 입력받은 다음, A+B를 출력하는 프로그램을 작성하시오.
+
+>Input. 두 정수 A와 B를 입력받은 다음, A+B를 출력하는 프로그램을 작성하시오.
+
+>Output. 각 테스트 케이스마다 "Case #x: "를 출력한 다음, A+B를 출력한다. 테스트 케이스 번호는 1부터 시작한다.
+
+
+### 내 풀이
+```python
+import sys
+
+T=0
+for n in [*sys.stdin][1:]:
+    T+=1
+    print(f"Case #{T}:", sum(map(int, n.split())))
+```
+
+- 굳이 sys 모듈을 import하여 사용할 필요는 없고 open(0)으로 치환하여 사용해도 괜찮을 것같다.
+
+### 기본 코드
+```python
+import sys
+
+T = int(input())
+
+for x in range(T):
+    A, B = sys.stdin.readline().rstrip().split()
+    print(f"Case #{x+1}: {int(A)+int(B)}")
+```
+
+## ⚙️ Sum 3
+
+>Q. 두 정수 A와 B를 입력받은 다음, A+B를 출력하는 프로그램을 작성하시오.
+
+>Input. 첫째 줄에 테스트 케이스의 개수 T가 주어진다.
+각 테스트 케이스는 한 줄로 이루어져 있으며, 각 줄에 A와 B가 주어진다. (0 < A, B < 10)
+
+>Output. 각 테스트 케이스마다 "Case #x: A + B = C" 형식으로 출력한다. x는 테스트 케이스 번호이고 1부터 시작하며, C는 A+B이다.
+
+```python
+T = 0
+
+for A,_,B,_ in [*open(0)][1:]:
+    T+=1
+    print(f"Case #{T}: {A} + {B} = {int(A)+int(B)}")
+```
+
