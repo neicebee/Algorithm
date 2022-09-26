@@ -6,9 +6,13 @@ Output. 첫째 줄부터 N번째 줄까지 차례대로 별을 출력한다.
 
 # N=n=int(input()); exec("n-=1;print('*'*(N-n));"*N)
 
-for i in range(int(input())):
-    print(f"i: {i}\n-i: {-i}\n~i: {~i}\n-~i: {-~i}")
-    print("=======")
+# for i in range(int(input())):
+#     print(f"i: {i}\n-i: {-i}\n~i: {~i}\n-~i: {-~i}")
+#     print("=======")
+
+num1 = 162
+num2 = ~num1
+print(bin(num2))
 
 '''
 ~ 비트 반전 연산자: bitwise NOT operator
@@ -17,4 +21,6 @@ for i in range(int(input())):
 -x: x의 부호를 바꾼다. x의 값이 0인 경우는 값이 변하지 않는다.
 ~x: x의 모든 비트를 뒤집는다. 예를 들어 x의 2진수 표현이 0000 1010일 경우 ~x는 1111 0101이 된다.
 https://www.acmicpc.net/problem/16122
+2의 보수
+signed int와 unsigned int
 '''
