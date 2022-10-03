@@ -10,9 +10,9 @@ Output. 첫째 줄부터 N번째 줄까지 차례대로 별을 출력한다.
 #     print(f"i: {i}\n-i: {-i}\n~i: {~i}\n-~i: {-~i}")
 #     print("=======")
 
-# num1 = 162
-# num2 = ~num1
-# print(bin(num2))
+num1 = 162
+num2 = ~num1
+print(bin(num2))
 
 '''
 ~ 비트 반전 연산자: bitwise NOT operator
