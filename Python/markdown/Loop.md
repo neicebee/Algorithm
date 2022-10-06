@@ -234,3 +234,69 @@ N=int(input())
 for i in range(N):
     print(f"{'*'*(i+1):>{N}}")
 ```
+
+- [파이썬의 문자열 포메팅에 대해서](https://it-neicebee.tistory.com/134)
+
+## ⚙️ Less than X
+
+>Q. 정수 N개로 이루어진 수열 A와 정수 X가 주어진다. 이때, A에서 X보다 작은 수를 모두 출력하는 프로그램을 작성하시오.
+
+>Input. 첫째 줄에 N과 X가 주어진다. (1 ≤ N, X ≤ 10,000)
+둘째 줄에 수열 A를 이루는 정수 N개가 주어진다. 주어지는 정수는 모두 1보다 크거나 같고, 10,000보다 작거나 같은 정수이다.
+
+>Output. X보다 작은 수를 입력받은 순서대로 공백으로 구분해 출력한다. X보다 작은 수는 적어도 하나 존재한다.
+
+```python
+N, X, *A = map(int, open(0).read().split())
+for i in A:
+    i<X!=print(i, end=" ")
+```
+
+## ⚙️ Sum 4
+
+>Q. 두 정수 A와 B를 입력받은 다음, A+B를 출력하는 프로그램을 작성하시오.
+
+>Input. 입력은 여러 개의 테스트 케이스로 이루어져 있다.
+각 테스트 케이스는 한 줄로 이루어져 있으며, 각 줄에 A와 B가 주어진다. (0 < A, B < 10)
+입력의 마지막에는 0 두 개가 들어온다.
+
+>Output. 각 테스트 케이스마다 A+B를 출력한다.
+
+```python
+for A,_,B,_ in [*open(0)]:
+    int(A)+int(B)!=0==print(f"{int(A)+int(B)}")
+```
+
+### while을 사용한 숏코드
+
+```python
+while A:=eval("+".join(input())):print(A)
+```
+
+## ⚙️ Sum 5
+
+>Q. 두 정수 A와 B를 입력받은 다음, A+B를 출력하는 프로그램을 작성하시오.
+
+>Input. 입력은 여러 개의 테스트 케이스로 이루어져 있다.
+각 테스트 케이스는 한 줄로 이루어져 있으며, 각 줄에 A와 B가 주어진다. (0 < A, B < 10)
+
+>Output. 각 테스트 케이스마다 A+B를 출력한다.
+
+### Code 1
+```python
+for A,_,B,_ in [*open(0)]:
+    print(int(A)+int(B))
+```
+
+### Code 2
+```python
+for i in open(0):
+    print(sum(map(int, i.split())))
+```
+
+### Short Code
+```python
+for i in open(0):
+    print(sum(b'%a'%i)%24)
+```
+- 바이트 객체를 사용한 풀이법
