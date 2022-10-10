@@ -300,3 +300,6 @@ for i in open(0):
     print(sum(b'%a'%i)%24)
 ```
 - 바이트 객체를 사용한 풀이법
+
+## ⚙️ Plus Cycle
+

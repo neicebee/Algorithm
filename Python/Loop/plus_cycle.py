@@ -10,9 +10,25 @@ Input. 첫째 줄에 N이 주어진다. N은 0보다 크거나 같고, 99보다 
 Output. 첫째 줄에 N의 사이클 길이를 출력한다.
 '''
 
-# N=int(input())
-# print((b'%d'%N)[0])
+N=n=int(input())
 
-N = 26
-A = '%a'%N
-print(N, '\n', A)
+while N:
+    result = sum(map(int, map(chr, b'%a'%N)))
+    num1 = chr((b'%a'%N)[1])
+    print(f'result= {result}, num1= {num1}')
+    if len(b'%a'%result) == 2:
+        num2 = chr((b'%a'%result)[1])
+    else:
+        num2 = str(result)
+    print(f'num2= {num2}')
+    print(type(num1), type(num2))
+    N = num1+num2
+# while N!=n:
+
+
+# result = b'%a'%N
+# print(result)
+# for i in result:
+#     print(i)
+# print(sum(map(int, map(chr, result))))
+# print(type(result))
