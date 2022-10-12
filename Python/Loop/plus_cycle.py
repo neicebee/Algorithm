@@ -10,25 +10,41 @@ Input. 첫째 줄에 N이 주어진다. N은 0보다 크거나 같고, 99보다 
 Output. 첫째 줄에 N의 사이클 길이를 출력한다.
 '''
 
-N=n=int(input())
+cycle_num = 0
+N=n=input()
 
-while N:
-    result = sum(map(int, map(chr, b'%a'%N)))
-    num1 = chr((b'%a'%N)[1])
-    print(f'result= {result}, num1= {num1}')
-    if len(b'%a'%result) == 2:
-        num2 = chr((b'%a'%result)[1])
-    else:
-        num2 = str(result)
-    print(f'num2= {num2}')
-    print(type(num1), type(num2))
-    N = num1+num2
-# while N!=n:
+while 1:
+    if len(N) == 1:
+        N=n="0%s"%N
+    result = str(int(N[0]) + int(N[1]))
+    N = N[-1]+result[-1]
+    cycle_num+=1
+    if N==n: print(cycle_num); break
 
 
-# result = b'%a'%N
-# print(result)
-# for i in result:
-#     print(i)
-# print(sum(map(int, map(chr, result))))
-# print(type(result))
+# def get_new_num(N: int) -> int:
+#     b_N = b'%a'%N
+#     result = sum(map(int, map(chr, b_N)))
+#     if len(b_N) == 1:
+#         num1 = chr(b_N[0])
+#     else: 
+#         num1 = chr(b_N[1])
+#     if len(b'%a'%result) == 2:
+#         N = num1+chr((b'%a'%result)[1])
+#     else:
+#         N = num1+str(result)
+    
+#     return int(N)
+
+# if __name__ == "__main__":
+#     condition = 1
+#     cycle_num = 0
+#     N=n=int(input())
+
+#     while condition:
+#         N = get_new_num(N)
+#         cycle_num+=1
+#         if N==n:
+#             condition = 0
+
+#     print(cycle_num)
