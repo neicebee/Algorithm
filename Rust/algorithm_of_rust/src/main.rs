@@ -1,26 +1,26 @@
+use std::io;
+
 fn main(){
-    loop{
-        let mut inputnums = String::new();
 
-        std::io::stdin().read_line(&mut inputnums)
-            .expect("nums reading error!");
+    let mut nums = String::new();
+    io::stdin().read_line(&mut nums)
+        .expect("Unable to read input!");
+    
+    let splitnums: Vec<&str> = nums.split(' ')
+        .collect();
 
-        let splitnums: Vec<&str> = inputnums.split(' ')
-            .collect();
+    let a = &splitnums[0];
+    let b = &splitnums[1];
 
-        let a = &splitnums[0];
-        let b = &splitnums[1];
+    let a: f64 = match a.trim().parse() {
+        Ok(x) => x,
+        Err(_) => 0.0,
+    };
 
-        let a : u32 = match a.trim().parse(){
-            Ok(x) => x,
-            Err(_) => continue,
-        };
+    let b: f64 = match b.trim().parse() {
+        Ok(x) => x,
+        Err(_) => 0.0,
+    };
 
-        let b : u32 = match b.trim().parse(){
-            Ok(x) => x,
-            Err(_) => continue,
-        };
-
-        println!("{}", a+b);
-    }
+    println!("{}", a/b);
 }
