@@ -20,75 +20,83 @@ Iterable & Iterator
         - .__next__()
 
 for & Iterator
+    - for은 실행과 동시에 값을 계속 만들어내며 메모리 차지
+    - Iterator은 순서대로 다음 값을 반환할 수 있는 순회 가능한 객체를 생성한 후 필요한 시점에 next 함수로 작동하기에 효율성이 좋음
+        - 데이터 생성을 미루는 방식을 lazyevaluation 이라고 칭함
     - 파이썬 for문은 내부적으로 Iterator를 생성해 동작
     - 해당 객체의 iter를 생성해 next로 순회
     - Stopiteration 발생 시 순회 중단
 '''
 
-class Iteration:
-    def __init__(self, stop_num):
-        self.pointer = 0
-        self.stop_num = stop_num
+# iterator 객체 구현해보기
+# class Class_of_Iteration:
+#     def __init__(self, start_num, stop_num):
+#         self.pointer = start_num
+#         self.max = stop_num
     
-    def __iter__(self):
-        return self
+#     def __iter__(self):
+#         return self
     
-    def __next__(self):
-        if self.stop_num > self.pointer:
-            self.pointer+=1
-            return self.pointer
-        else:
-            raise StopIteration
+#     def __next__(self):
+#         if self.pointer > self.max:
+#             raise StopIteration
+#         else:
+#             self.pointer+=1
+#             return self.pointer-1
 
-class Iterable:
-    def __init__(self, stop_num):
-        self.stop_num = stop_num
+# A = Class_of_Iteration(1, 3)
+# print(type(A))
+# print(A.__next__())
+# print(A.__next__())
+# print(A.__next__())
+# print(A.__next__()) # 예외발생: StopIteration
 
-    def __iter__(self):
-        return Iterator(self.stop_num)
+# while
+import random
 
-class Iterator:
-    def __init__(self, stop_num):
-        self.pointer = 0
-        self.stop_num = stop_num
-    
-    def __next__(self):
-        if self.stop_num > self.pointer:
-            self.pointer += 1
-            return self.pointer
-        else:
-            raise StopIteration
+while_res = []
 
-A = Iteration(3)
-print(A)
+while 1:
+    i = random.randint(0, 10)
+    if i == 2:
+        break
+    else:
+        while_res.append(i)
 
-num_list_1 = [i for i in range(5)].__iter__()
-print(num_list_1)
+print(while_res)
 
-for i in num_list_1:
-    print(i, end=' ')
-# list_iterator object
-print('\n')
+# iterator
+# iter_res = [x for x in iter(lambda : random.randint(0, 10), 2)]
+print(lambda: random.randint(1, 10), 2)
+# print(iter_res)
 
-num_list_2 = (j for j in range(5))
-print(num_list_2)
+# num_list_1 = [i for i in range(5)].__iter__()
+# print(num_list_1)
 
-for j in num_list_2:
-    print(j, end=' ')
-# generator object
-print('\n')
+# for i in num_list_1:
+#     print(i, end=' ')
+# # list_iterator object
+# print('\n')
 
-num_list_3 = iter(range(5))
-print(num_list_3)
+# num_list_2 = (j for j in range(5))
+# print(num_list_2)
 
-for x in num_list_3:
-    print(x, end=' ')
-# range_iterator object
-print('\n')
+# for j in num_list_2:
+#     print(j, end=' ')
+# # generator object
+# print('\n')
 
-num_list_4 = map(lambda x: x, [0, 1, 2, 3, 4])
-print(num_list_4)
+# num_list_3 = iter(range(5))
+# print(num_list_3)
 
-for y in num_list_4:
-    print(y, end=' ')
-# map object
+# for x in num_list_3:
+#     print(x, end=' ')
+# # range_iterator object
+# print('\n')
+
+# num_list_4 = map(lambda x: x, [0, 1, 2, 3, 4])
+# print(num_list_4)
+
+# for y in num_list_4:
+#     print(y, end=' ')
+# # map object
