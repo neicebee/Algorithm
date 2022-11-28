@@ -14,18 +14,21 @@ Iterable & Iterator
     - Iterator은 next 함수 O
     - Iterable한 객체는 Iterator로 만들 수 있음
         - iter() 사용
+            - iter(object to callable, sentinel)
+            - 반복을 끝낼 값을 지정할 수 있음
         - .__iter__() 사용
     - Iterator은 두 함수로 다음 값을 반환할 수 있음
         - next()
         - .__next__()
 
-for & Iterator
-    - for은 실행과 동시에 값을 계속 만들어내며 메모리 차지
+Loop & Iterator
+    - Loop는 실행과 동시에 값을 계속 만들어내며 메모리 차지
     - Iterator은 순서대로 다음 값을 반환할 수 있는 순회 가능한 객체를 생성한 후 필요한 시점에 next 함수로 작동하기에 효율성이 좋음
         - 데이터 생성을 미루는 방식을 lazyevaluation 이라고 칭함
     - 파이썬 for문은 내부적으로 Iterator를 생성해 동작
-    - 해당 객체의 iter를 생성해 next로 순회
-    - Stopiteration 발생 시 순회 중단
+        - 해당 객체의 iter를 생성해 next로 순회
+        - Stopiteration 발생 시 순회 중단
+    - Iterator는 예외 처리를 해야 하는 while보다는 StopIteration을 쉽게 제어할 수 있는 for와 함께 자주 쓰임
 '''
 
 # iterator 객체 구현해보기
@@ -66,9 +69,24 @@ while 1:
 print(while_res)
 
 # iterator
-# iter_res = [x for x in iter(lambda : random.randint(0, 10), 2)]
-print(lambda: random.randint(1, 10), 2)
-# print(iter_res)
+# lambda 매개변수 : 표현식
+iter_res = [x for x in iter(lambda: random.randint(0, 10), 2)]
+print(iter_res)
+
+N = ['f1r3', '_', 'r41n']
+# while
+while_iter = iter(N)
+while 1:
+    try:
+        i = next(while_iter)
+    except StopIteration:
+        break
+    print(i, end='')
+
+# for
+for_iter = iter(N)
+for _ in range(len(N)):
+    print(for_iter.__next__(), end='')
 
 # num_list_1 = [i for i in range(5)].__iter__()
 # print(num_list_1)
