@@ -29,7 +29,6 @@
     fn main() {
         println!("Max_num: {}", MAX_NUM);
     }
-
     // Result
     // Max_num: 100000
     ```

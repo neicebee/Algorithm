@@ -1,5 +1,6 @@
 fn main() {
-    let tup = (500, 6.4, 1);
-
-    println!("{}, {}, {}", tup.0, tup.1, tup.2);
+    for i in (1..4).rev(){
+        println!("{}...", i);
+    }
+    println!("발사!");
 }
