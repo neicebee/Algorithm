@@ -1,10 +1,5 @@
 use std::io;
 
-// 변수의 타입을 출력하는 함수
-// fn print_type_of<T>(_: &T) {
-//     println!("{}", std::any::type_name::<T>())
-// }
-
 fn input_temperature() -> f64 {
     loop{
         println!("온도를 입력해주세요...");
@@ -15,7 +10,10 @@ fn input_temperature() -> f64 {
 
         let tem: f64 = match tem.trim().parse() {
             Ok(num) => num,
-            Err(_) => continue,
+            Err(_) => {
+                println!("Error! You have to input number!");
+                continue
+            },
         };
 
         break tem;
@@ -35,22 +33,6 @@ fn calculation(u: &str, t: f64) -> f64 {
 }
 
 fn main() {
-
-    // // alloc::string::String
-    // let test_string = String::from("test!!!");
-    // print_type_of(&test_string);
-    // println!("{}", test_string);
-
-    // // &str
-    // let test_str = "test!!!";
-    // print_type_of(&test_str);
-    // println!("{}", test_str);
-
-    // // &str 슬라이싱
-    // let test_slice = &test_string[1..4];
-    // print_type_of(&test_slice);
-    // println!("{}", test_slice);
-
     loop{
         println!("단위 입력(C & F)...");
 
