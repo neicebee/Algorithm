@@ -1,32 +1,30 @@
+# # 재귀함수 - 배열 사용 O
 # fibo_arr = [0, 1]
 
 # def fibo(n):
 #     try:
-#         print(f"fibo: {n}")
 #         return fibo_arr[n]
-#     except:
-#         print(f"Repeat!! {n}")
-#         return fibo(n-1) + fibo(n-2)
+#     except IndexError:
+#         fibo_arr.append(fibo(n-1) + fibo(n-2))
+#         return fibo_arr[n]
+
+# num = int(input())
+# print(fibo(num))
+# print(fibo_arr)
+
+# # 재귀함수 - 배열 사용 X
+# def fibo(n):
+#     return n if n == 0 or 1 else fibo(n-1) + fibo(n-2)
 
 # num = int(input())
 # print(fibo(num))
 
-fibo_arr = [0, 1, 1]
+# # for문
+# fibo = [0, 1]
 
-n = int(input())
+# n = int(input())
 
-for i in range(len(fibo_arr), n+1):
-    print(fibo_arr)
-    fibo_arr[i%3] = fibo_arr[(i-1)%3] + fibo_arr[(i-2)%3]
+# for i in range(len(fibo), n+1):
+#     fibo[i%2] = fibo[(n-1)%2] + fibo[(n-2)%2]
 
-print(fibo_arr[n%3])
-
-'''
-int byLoop(int n){
-    int f[3] = {0,1,1};
-    for(int i = 3; i <= n; i++){
-        f[i%3] = f[(i-1)%3] + f[(i-2)%3];
-    }
-    return f[n%3];
-}
-'''
+# print(fibo[n%2])
