@@ -1,14 +1,36 @@
+def fibo(n):
+    SIZE = 2
+    BASE = [[1, 1], [1, 0]]
+
+    def matrix_operation(a, b, size=SIZE):
+        new = [[0 for _ in range(size)] for _ in range(size)]
+        print(new)
+
+    def matrix_judgment(n):
+        matrix = BASE.copy()
+        k = 0
+
+        while 2 ** k <= n:
+            if n & (1 << k) != 0:
+                matrix_operation(matrix, BASE)
+            print(2 ** k)
+            k+=1
+    
+    matrix_judgment(n)
+
+fibo(5)
+
 # 예제값: 1100
 
-# dict을 사용한 재귀함수 => 272 마이크로초
-def fibo(n, __fibo_arr={0: 0, 1: 1}):
-    if n in __fibo_arr: return __fibo_arr[n]
+# # dict을 사용한 재귀함수 => 272 마이크로초
+# def fibo(n, __fibo_arr={0: 0, 1: 1}):
+#     if n in __fibo_arr: return __fibo_arr[n]
 
-    __fibo_arr[n] = fibo(n-1)+fibo(n-2)
-    return __fibo_arr[n]
+#     __fibo_arr[n] = fibo(n-1)+fibo(n-2)
+#     return __fibo_arr[n]
 
-num = int(input())
-print(fibo(num))
+# num = int(input())
+# print(fibo(num))
     
 # # 재귀적 동적 계획법 => 374 마이크로초
 # def fibo(n):
