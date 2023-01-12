@@ -1,3 +1,4 @@
+# 행렬 연산
 def fibo(n):
     # 2*2 배열 크기 고정값
     SIZE = 2
@@ -31,9 +32,10 @@ def fibo(n):
         while 2 ** k <= n:
             # 비트 연산자인 &와 <<를 사용하여 포함 여부 판단
             if n & (1 << k) != 0:
-                matrix = square_matrix_operation(matrix, tmp)
+                print(f'matrix: {matrix}'); matrix = square_matrix_operation(matrix, tmp)
             k+=1
-            tmp = square_matrix_operation(tmp, tmp)
+            # BASE를 통해 계속 2**k 행렬을 저장하는 코드 
+            print(f'tmp: {tmp}'); tmp = square_matrix_operation(tmp, tmp)
         
         return matrix
 
