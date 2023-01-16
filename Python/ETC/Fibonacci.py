@@ -1,48 +1,55 @@
-# 행렬 연산
+# 일반항 연산
 def fibo(n):
-    # 2*2 배열 크기 고정값
-    SIZE = 2
-    # fibonacci 행렬 연산의 기본값
-    BASE = [[1, 1], [1, 0]]
-    # 행렬의 곱셈에 대한 항등원
-    IDENTITY = [[1, 0], [0, 1]]
-
-    # 행렬의 곱셉 연산 함수
-    def square_matrix_operation(a, b, size=SIZE):
-        # 결과값을 담을 배열 선언 및 초기화
-        new = [[0 for _ in range(size)] for _ in range(size)]
-        
-        for i in range(size):
-            for j in range(size):
-                for k in range(size):
-                    new[i][j] += a[i][k] * b[k][j]
-        
-        print(new)
-        return new
-
-    # 행렬의 n승을 구하기 위한 판단 함수
-    def matrix_judgment(n):
-        # 최종 결과물
-        matrix = IDENTITY.copy()
-        # 임시적인 배열
-        tmp = BASE.copy()
-        k = 0
-
-        # 0 이상의 정수 k에 대한 자연수 n이 2**k 를 포함하는지 판단하는 코드
-        while 2 ** k <= n:
-            # 비트 연산자인 &와 <<를 사용하여 포함 여부 판단
-            if n & (1 << k) != 0:
-                print(f'matrix: {matrix}'); matrix = square_matrix_operation(matrix, tmp)
-            k+=1
-            # BASE를 통해 계속 2**k 행렬을 저장하는 코드 
-            print(f'tmp: {tmp}'); tmp = square_matrix_operation(tmp, tmp)
-        
-        return matrix
-
-    return matrix_judgment(n)[0][1]
+    sqrt_5 = 5 ** (1/2)
+    result = 1 / sqrt_5 * ( ((1 + sqrt_5) / 2) ** n  - ((1 - sqrt_5) / 2) ** n )
+    return int(result)
 
 num = int(input())
 print(fibo(num))
+
+# # 행렬 연산
+# def fibo(n):
+#     # 2*2 배열 크기 고정값
+#     SIZE = 2
+#     # fibonacci 행렬 연산의 기본값
+#     BASE = [[1, 1], [1, 0]]
+#     # 행렬의 곱셈에 대한 항등원
+#     IDENTITY = [[1, 0], [0, 1]]
+
+#     # 행렬의 곱셉 연산 함수
+#     def square_matrix_operation(a, b, size=SIZE):
+#         # 결과값을 담을 배열 선언 및 초기화
+#         new = [[0 for _ in range(size)] for _ in range(size)]
+        
+#         for i in range(size):
+#             for j in range(size):
+#                 for k in range(size):
+#                     new[i][j] += a[i][k] * b[k][j]
+#         return new
+
+#     # 행렬의 n승을 구하기 위한 판단 함수
+#     def matrix_judgment(n):
+#         # 최종 결과물
+#         matrix = IDENTITY.copy()
+#         # 임시적인 배열
+#         tmp = BASE.copy()
+#         k = 0
+
+#         # 0 이상의 정수 k에 대한 자연수 n이 2**k 를 포함하는지 판단하는 코드
+#         while 2 ** k <= n:
+#             # 비트 연산자인 &와 <<를 사용하여 포함 여부 판단
+#             if n & (1 << k) != 0:
+#                 matrix = square_matrix_operation(matrix, tmp)
+#             k+=1
+#             # BASE를 통해 계속 2**k 행렬을 저장하는 코드 
+#             tmp = square_matrix_operation(tmp, tmp)
+        
+#         return matrix
+
+#     return matrix_judgment(n)[0][1]
+
+# num = int(input())
+# print(fibo(num))
 
 # 예제값: 1100
 

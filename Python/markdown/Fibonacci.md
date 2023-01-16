@@ -9,6 +9,7 @@
 
 - 위의 수식만 보면 Fibonacci 수열의 n번째 수를 찾는 코드는 쉽게 구현이 가능
 - 아래에서 서술할 코드들에 1100을 각각 할당하여 주피터 노트북의 `%%timeit` 을 사용해 처리 시간을 확인해보자
+  - 코드들의 print 함수를 모두 제외했고 단순 함수 호출만으로 시간을 측정함
 
 ## 👀 단순 재귀
 - 단순히 공식만 대입하여 재귀적으로 풀이해보자
@@ -53,7 +54,7 @@ num = int(input())
 print(fibo(num))
 ```
 * Fibonacci Sequence 정의에 맞게 변수 초기화 후 n번째까지 반복을 통해 모든 항을 구함
-* **1100 값 할당 -> 138 µs ± 1.1 µs**
+* **1100 값 할당 -> 125 µs ± 692 ns**
 
 ```python
 def fibo(n):
@@ -69,13 +70,12 @@ num = int(input())
 print(fibo(num))
 ```
 * 단순 변수 두 개만으로 구현한 같은 방식의 코드
-* **1100 값 할당 -> 42.1 µs ± 228 ns**
+* **1100 값 할당 -> 37.8 µs ± 84.6 ns**
 
 - **_해당 방법은 입력값인 n만큼 계산하기 때문에 시간복잡도는 $O(n)$_**
 - 시간복잡도로 비교할 시 단순 재귀보다 훨씬 효율적인 것을 알 수 있음
 
 ## 👀 재귀적 동적 계획법
-
 - 동적 계획법 : 부분문제를 해결하면 해당 값을 저장하는 공간 사용
 - 배열을 사용한 재귀적 풀이
 - 저장공간에 있는 부분문제의 값을 찾고 없으면 계산
@@ -99,7 +99,7 @@ def fibo(n):
 num = int(input())
 print(fibo(num))
 ```
-* **1100 값 할당 -> 372 µs ± 1.27 µs**
+* **1100 값 할당 -> 365 µs ± 188 ns**
 
 - 동적 계획법은 무작정 반복 코드에도 적용이 가능 -> 반복적 동적 계획법
 - **재귀적 동적 계획법은 함수를 호출하는 데 따르는 오버헤드가 발생하기 때문에 절대적으로는 반복적 동적 계획법보다 시간이 오래 걸림**
@@ -121,23 +121,29 @@ print(fibo(num))
   * **_위 코드와 같이 원하는 데이터를 함수 정의부에 적으면 그 자료구조는 함수가 정의될 때 생성되어 함수가 호출되거나 종료되거나 상관없이 함수 자체가 메모리에서 지워지기 전까지 값이 유지됨_**
   * 함수 실행 시 데이터가 꾸준히 변화하고 값이 보존되기에 예상하지 못한 에러를 마주할 수 있는 방식
   * 파이썬의 내부 동작 방식을 활용하기에 파이썬에서만 구현 가능한 방식
-* **1100 값 할당 -> 272 µs ± 2.43 µs**
+* **1100 값 할당 -> 266 µs ± 550 ns**
 
 ## 👀 행렬 연산
 - 행렬 연산의 Fibonacci 공식
   - $(\frac{F_{n+1}} {F_{n}}$ $\frac{F_{n}} {F_{n-1}})$ $=$ $(\frac{1} {1}$ $\frac{1} {0})^n$
 - 행렬 연산 중 곱셈과 거듭제곱에 대한 포스팅
-  - (https://mathbang.net/562)[https://mathbang.net/562]
+  - [https://mathbang.net/562](https://mathbang.net/562)
+- 행렬 연산 중 행렬의 곱셈 항등원에 대한 포스팅
+  - [https://mathbang.net/565](https://mathbang.net/565)
+- $n^{64}$ 을 구하려면 $n$ 을 64번 곱해 구할 수 있음
+  - 2의 제곱수를 활용해 결과물을 6번 제곱하면 $n^{64}$
+    - $log_264$
+    - $(n^{1})^2 = (n^{2})^2 = (n^{4})^2 = (n^{8})^2 = (n^{16})^2 = (n^{32})^2 = n^{64}$
 - $n^{100}$ 을 구하려면 $n$ 을 100번 곱해 구할 수 있음
   - 모든 자연수는 2의 제곱수의 합으로 나타낼 수 있음
-    - $n^{100} = n^{64}*n^{32}*n^{4}$
+    - $n^{100} = n^{64}*n^{32}*n^4$
 - 다음과 같은 방법을 적용하여 부분문제의 값을 저장해두고 필요 시 꺼내서 사용하는 방식을 구현
 
 ```python
 def fibo(n):
     # 2*2 배열 크기 고정값
     SIZE = 2
-    # fibonacci 행렬 연산의 기본값
+    # fibonacci sequence 행렬 연산의 기본값
     BASE = [[1, 1], [1, 0]]
     # 행렬의 곱셈에 대한 항등원
     IDENTITY = [[1, 0], [0, 1]]
@@ -151,8 +157,6 @@ def fibo(n):
             for j in range(size):
                 for k in range(size):
                     new[i][j] += a[i][k] * b[k][j]
-        
-        print(new)
         return new
 
     # 행렬의 n승을 구하기 위한 판단 함수
@@ -167,15 +171,70 @@ def fibo(n):
         while 2 ** k <= n:
             # 비트 연산자인 &와 <<를 사용하여 포함 여부 판단
             if n & (1 << k) != 0:
-                print(f'matrix: {matrix}'); matrix = square_matrix_operation(matrix, tmp)
+                matrix = square_matrix_operation(matrix, tmp)
             k+=1
             # BASE를 통해 계속 2**k 행렬을 저장하는 코드 
-            print(f'tmp: {tmp}'); tmp = square_matrix_operation(tmp, tmp)
+            tmp = square_matrix_operation(tmp, tmp)
         
         return matrix
-
+    
     return matrix_judgment(n)[0][1]
 
 num = int(input())
 print(fibo(num))
 ```
+* `BASE` : Fibonacci Sequence 행렬 연산 공식의 기본이 되는 변수
+* `IDENTITY` : 행렬 곱셈의 항등원 변수
+* `square_matrix_operation` : 정방형 행렬의 곱셈을 구현한 함수
+* `matrix judgment` : `square_matrix_operation` 함수에게 어떤 값을 넘길지 판단하는 함수
+  * `matrix` : $n$의 값이 0일 때를 고려하여 항등원을 copy한 변수
+  * `tmp` : $k$의 값이 커짐에 따라 꾸준히 $2^k$ 행렬을 저장하는 변수
+  * $n$이 $2^k$를 포함하는지에 대한 여부를 while 반복문과 비트 연산자로 판단
+    * 포함한다면 $n$을 구성하는 $2^k$ 조건에서 `square_matrix_operation` 함수에 `matrix` 와 `tmp` 를 넘김
+* **1100 값 할당 -> 43.9 µs ± 43.4 ns**
+
+- **_해당 방법의 시간복잡도는 $O(log_2n)$_**
+
+## 👀 일반항 연산
+- Fibonacci 식
+  - $F_{i+1} = F_i + F_{i-1}$
+  - $F_1 = F_2 = 1$
+- $\alpha$와 $\beta$ 정의
+  - $\alpha + \beta = 1$
+  - $\alpha\beta = -1$
+- 방정식 1
+  - $F_{i+1} - F_i - F_{i-1} = 0$
+  - $F_{i+1} - F_i = \beta(F_i - F_{i-1})$
+  - = $\beta^2(F_{i-1} - \alpha F_{i-2})$
+  - = $\beta^{i-1}(F_2 - \alpha F_1)$
+  - = $\beta^{i-1}(1 - \alpha)$
+- 방정식 2
+  - $F_{i+1} - F_i - F_{i-1} = 0$
+  - $F_{i+1} - F_i = \alpha(F_i - F_{i-1})$
+  - = $\alpha^2(F_{i-1} - \beta F_{i-2})$
+  - = $\alpha^{i-1}(F_2 - \beta F_1)$
+  - = $\alpha^{i-1}(1 - \beta)$
+- 방정식 1과 2 정리
+  - $F_i = \frac{1}{\alpha-\beta}\alpha^{i-1}(1 - \beta)-\beta^{i-1}(1-\alpha)$
+  - = $\frac{\alpha^i-\beta^i}{\alpha-\beta}$
+- $\alpha$와 $\beta$ 구하기
+  - 근의 방정식 사용
+  - $\alpha=\frac{1+\sqrt{5}}{2}$
+  - $\beta=\frac{1-\sqrt{5}}{2}$
+- 대입하기
+  - $F_i=\frac{1}{\sqrt{5}}(\frac{1+\sqrt{5}}{2})^n-(\frac{1-\sqrt{5}}{2})^n$
+
+```python
+def fibo(n):
+    sqrt_5 = 5 ** (1/2)
+    result = 1 / sqrt_5 * ( ((1 + sqrt_5) / 2) ** n  - ((1 - sqrt_5) / 2) ** n )
+    return int(result)
+
+num = int(input())
+print(fibo(num))
+```
+* 수식 특성상 $n$이 커지면 커질수록 오차범위가 늘어남
+* 시간복잡도로 따지면 효율적인 코드가 맞으나 정확도로 따지면 쓸 이유가 없는 코드
+* **1100 값 할당 -> 431 ns ± 0.86 ns**
+
+- **_해당 방법의 시간복잡도는 $O(log_n)$_**
