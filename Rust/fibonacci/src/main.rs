@@ -35,10 +35,22 @@ fn recursive_fibo(n: u32) -> u64 {
     }
 }
 
-// fn recursive_dynamic_fibo(n: u32) {
-//     let mut fibo_arr = [0, 1];
+fn recursive_dynamic_fibo(n: u32) {
+    let n: usize = n.try_into().unwrap();
+    let fibo_vec: Vec<usize> = vec![0, 1];
 
-// }
+    iterator(n, fibo_vec);
+}
+
+fn iterator(n: usize, mut fibo_vec: Vec<usize>) -> usize {
+    if fibo_vec.get(n) != None {
+        println!("{}", fibo_vec[n]);
+        return fibo_vec[n];
+    } else {
+        fibo_vec.push(iterator(n-1, fibo_vec));
+        return fibo_vec[n];
+    }
+}
 
 fn main() {
     loop {
@@ -55,10 +67,10 @@ fn main() {
             },
         };
 
-        println!("{}", simple_fibo(number));
-        println!("{}", recursive_fibo(number));
-        println!("{}", array_fibo(number));
-        // recursive_dynamic_fibo(number);
+        // println!("{}", simple_fibo(number));
+        // println!("{}", recursive_fibo(number));
+        // println!("{}", array_fibo(number));
+        recursive_dynamic_fibo(number);
         break;
     }
 }
