@@ -16,6 +16,17 @@ fn simple_fibo(n: u32) -> u64 {
     return b;
 }
 
+fn array_fibo(n: u32) -> usize {
+    let mut fibo_arr: [usize; 2] = [0, 1];
+    let n: usize = n.try_into().unwrap();
+
+    for i in fibo_arr.len()..n+1 {
+        fibo_arr[i%2] = fibo_arr[(n-1)%2] + fibo_arr[(n-2)%2];
+    }
+
+    return fibo_arr[n%2]
+}
+
 fn recursive_fibo(n: u32) -> u64 {
     if n <= 1 {
         return n.into();
@@ -23,6 +34,11 @@ fn recursive_fibo(n: u32) -> u64 {
         return recursive_fibo(n-1) + recursive_fibo(n-2);
     }
 }
+
+// fn recursive_dynamic_fibo(n: u32) {
+//     let mut fibo_arr = [0, 1];
+
+// }
 
 fn main() {
     loop {
@@ -41,6 +57,8 @@ fn main() {
 
         println!("{}", simple_fibo(number));
         println!("{}", recursive_fibo(number));
+        println!("{}", array_fibo(number));
+        // recursive_dynamic_fibo(number);
         break;
     }
 }
