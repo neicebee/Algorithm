@@ -1,4 +1,4 @@
-# 🦀 Rust Day 7
+# 🦀 Rust Day 8
 
 ## **🏳️ Rust Example Script 2 - Nth in Fibonacci Sequence**
 
