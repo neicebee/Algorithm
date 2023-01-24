@@ -1,21 +1,18 @@
-// 변수의 타입을 출력하는 함수
-fn print_type_of<T>(_: &T) {
-    println!("{}", std::any::type_name::<T>())
+fn main() {
+    let s1 = give_ownership();
+    let s2 = String::from("Rust!");
+    println!("{}", s2);
+    
+    let s3 = take_and_give(s2);
+
+    println!("{} {}", s1, s3);
 }
 
-fn main() {
-    // alloc::string::String
-    let test_string = String::from("test!!!");
-    print_type_of(&test_string);
-    println!("{}", test_string);
+fn give_ownership() -> String {
+    let s = String::from("Rust!!");
+    s
+}
 
-    // &str
-    let test_str = "test!!!";
-    print_type_of(&test_str);
-    println!("{}", test_str);
-
-    // 문자열 슬라이싱
-    let test_slice = &test_string[1..4];
-    print_type_of(&test_slice);
-    println!("{}", test_slice);
+fn take_and_give(s: String) -> String {
+    s
 }
