@@ -1,18 +1,20 @@
 fn main() {
-    let s1 = give_ownership();
-    let s2 = String::from("Rust!");
-    println!("{}", s2);
-    
-    let s3 = take_and_give(s2);
+    let s_words = String::from("little bottle of water");
+    let l_words = "Chips! tomato and lettuce";
+    let s_f_word = find_first_word(&s_words[..]);
+    let l_f_word = find_first_word(l_words);
 
-    println!("{} {}", s1, s3);
+    println!("{}", s_f_word);
+    println!("{}", l_f_word);
 }
 
-fn give_ownership() -> String {
-    let s = String::from("Rust!!");
-    s
-}
+fn find_first_word(s: &str) -> &str{
+    let byte_s = s.as_bytes();
 
-fn take_and_give(s: String) -> String {
+    for (i, &item) in byte_s.iter().enumerate() {
+        if item == b' ' {
+            return &s[..i];
+        }
+    }
     s
 }
