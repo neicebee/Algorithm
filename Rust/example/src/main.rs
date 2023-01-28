@@ -1,20 +1,28 @@
-fn main() {
-    let s_words = String::from("little bottle of water");
-    let l_words = "Chips! tomato and lettuce";
-    let s_f_word = find_first_word(&s_words[..]);
-    let l_f_word = find_first_word(l_words);
-
-    println!("{}", s_f_word);
-    println!("{}", l_f_word);
+#[derive(Debug)]
+struct User {
+    username: String,
+    pw: String,
+    email: String,
+    sign_in_count: u32,
+    active: bool,
 }
 
-fn find_first_word(s: &str) -> &str{
-    let byte_s = s.as_bytes();
+fn main() {
+    let user1 = User{
+        username: String::from("f1r3_r41n"),
+        pw: String::from("a12345"),
+        email: String::from("qkrghkql1@gmail.com"),
+        sign_in_count: 3,
+        active: true,
+    };
 
-    for (i, &item) in byte_s.iter().enumerate() {
-        if item == b' ' {
-            return &s[..i];
-        }
-    }
-    s
+    let user2 = User{
+        username: String::from("gnuykob_"),
+        pw: String::from("b12345"),
+        email: String::from("leebk1124@gmail.com"),
+        ..user1
+    };
+
+    println!("{:?}", user1);
+    println!("{:?}", user2);
 }
