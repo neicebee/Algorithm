@@ -1,28 +1,16 @@
 #[derive(Debug)]
-struct User {
-    username: String,
-    pw: String,
-    email: String,
-    sign_in_count: u32,
-    active: bool,
+enum IpAddrKind {
+    V4(String),
+    V6(String),
 }
 
 fn main() {
-    let user1 = User{
-        username: String::from("f1r3_r41n"),
-        pw: String::from("a12345"),
-        email: String::from("qkrghkql1@gmail.com"),
-        sign_in_count: 3,
-        active: true,
-    };
+    let home = IpAddrKind::V4(
+        String::from("127.0.0.1")
+    );
+    let switch = IpAddrKind::V6(
+        String::from("::1")
+    );
 
-    let user2 = User{
-        username: String::from("gnuykob_"),
-        pw: String::from("b12345"),
-        email: String::from("leebk1124@gmail.com"),
-        ..user1
-    };
-
-    println!("{:?}", user1);
-    println!("{:?}", user2);
+    println!("{:?}\n{:?}", home, switch);
 }
