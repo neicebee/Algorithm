@@ -28,6 +28,13 @@ fn value_in_cents(coin: Coin) -> u32 {
 }
 
 fn main() {
-    let coin = Coin::Quarter(UsState::Ohio);
-    println!("{}", value_in_cents(coin));
+    let coin = Coin::Penny;
+    let mut count = 0;
+    
+    if let Coin::Quarter(state) = coin {
+        println!("State quarter from {:?}.", state);
+    } else {
+        count += 1;
+        println!("{}", count);
+    }
 }
