@@ -57,7 +57,7 @@ fn main() {
 
 [function_stdin in Official Document](https://doc.rust-lang.org/std/io/fn.stdin.html)
 
-[Trait_Read in Official Document](https://doc.rust-lang.org/std/io/trait.Read.html)
+[trait_Read in Official Document](https://doc.rust-lang.org/std/io/trait.Read.html)
 
 <br>
 
@@ -109,11 +109,15 @@ fn main() {
 
 [struct_Map in Official Document](https://doc.rust-lang.org/std/iter/struct.Map.html)
 
+[trait_Iterator_method_collect in Official Document](https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.collect)
+
 <br>
 
 ## A$\times$B
 
 [Question_Link - 10998](https://www.acmicpc.net/problem/10998)
+
+### Basic Code
 
 ```rust
 use std::io;
@@ -136,11 +140,36 @@ fn main() {
 }
 ```
 
+### Improvement Code
+
+```rust
+use std::io;
+
+fn main() {
+    let mut numbers = String::new();
+    io::stdin().read_line(&mut numbers)
+        .expect("No input");
+    println!(
+        "{:?}",
+        numbers.split(' ')
+        .map(
+            |x| x.trim().parse().expect("error")
+        ).fold(1, |a, b: i32| a*b)
+    );
+}
+```
+
+<br>
+
+[trait_Iterator_method_fold in Official Document](https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.fold)
+
 <br>
 
 ## A/B
 
 [Question_Link - 1008](https://www.acmicpc.net/problem/1008)
+
+### Basic Code
 
 ```rust
 use std::io;
@@ -160,6 +189,23 @@ fn main() {
         Err(_) => 0.0,
     };
     println!("{}", a/b);
+}
+```
+
+### Improvement Code
+
+```rust
+use std::io;
+
+fn main() {
+    let mut numbers = String::new();
+    io::stdin().read_line(&mut numbers)
+        .expect("No input");
+    let split_nums: Vec<f64> = numbers.split(' ')
+        .map(
+            |x| x.trim().parse().expect("error")
+        ).collect();
+    println!("{}", split_nums[0]/split_nums[1]);
 }
 ```
 

@@ -4,11 +4,9 @@ fn main() {
     let mut numbers = String::new();
     io::stdin().read_line(&mut numbers)
         .expect("No input");
-    println!(
-        "{:?}",
-        numbers.trim().split(' ')
+    let split_nums: Vec<f64> = numbers.split(' ')
         .map(
-            |x| x.parse().expect("error")
-        ).fold(1, |a, b: i8| a*b)
-    );
+            |x| x.trim().parse().expect("error")
+        ).collect();
+    println!("{:?}", split_nums);
 }
