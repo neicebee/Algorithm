@@ -395,4 +395,116 @@ fn main() {
 
 [Question_Link - 2588](https://www.acmicpc.net/problem/2588)
 
-### 
+### Basic Code
+
+```rust
+use std::io;
+
+fn main() {
+    let mut a = String::new();
+    let mut b = String::new();
+    io::stdin().read_line(&mut a)
+        .expect("Error");
+    io::stdin().read_line(&mut b)
+        .expect("Error");
+    let mul_nums: [u32; 2] = [
+        a.trim().parse().expect("Error"),
+        b.trim().parse().expect("Error")
+    ];
+
+    println!(
+        "{}\n{}\n{}\n{}",
+        mul_nums[0]*(mul_nums[1]%10),
+        mul_nums[0]*((mul_nums[1]%100)/10),
+        mul_nums[0]*(mul_nums[1]/100),
+        mul_nums[0]*mul_nums[1]
+    );
+}
+```
+
+### Improvement Code
+
+```rust
+use std::io;
+
+fn toss_u32() -> u32 {
+    let mut a = String::new();
+    io::stdin().read_line(&mut a)
+        .expect("Error");
+    a.trim().parse().expect("Error")
+}
+
+fn main() {
+    let (n1, n2) = (toss_u32(), toss_u32());
+    println!(
+        "{}\n{}\n{}\n{}",
+        n1*(n2%10),
+        n1*((n2%100)/10),
+        n1*(n2/100),
+        n1*n2
+    );
+}
+```
+
+<br>
+
+## Cat
+
+[Question_Link - 10171](https://www.acmicpc.net/problem/10171)
+
+### Basic Code
+
+```rust
+fn main() {
+    println!("\\    /\\\n )  ( ')\n(  /  )\n \\(__)|");
+}
+```
+
+<br>
+
+## Dog
+
+[Question_Link - 10172](https://www.acmicpc.net/problem/10172)
+
+### Basic Code
+
+```rust
+fn main() {
+    print!("|\\_/|\n");
+	print!("|q p|   /}}\n");
+	print!("( 0 )\"\"\"\\\n");
+	print!("|\"^\"`    |\n");
+	print!("||_/=\\\\__|\n");
+}
+```
+
+### Improvement Code
+
+```rust
+fn main(){
+    print!(r#"|\_/|
+|q p|   /}}
+( 0 )"""\
+|"^"`    |
+||_/=\\__|"#);
+}
+```
+
+<br>
+
+## Sprout
+
+[Question_Link - 25083](https://www.acmicpc.net/problem/25083)
+
+## Basic Code
+
+```rust
+fn main(){
+    print!(r#"         ,r'"7
+r`-_   ,'  ,/
+ \. ". L_r'
+   `~\/
+      |
+      |"#);
+}
+```
