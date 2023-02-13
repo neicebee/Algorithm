@@ -103,3 +103,202 @@ pub fn eat_at_restaurant() {
 ```
 - `add_to_waitlist` 함수는 `eat_at_restaurant` 함수와 같은 크레이트에 정의되어 있으므로 절대 경로를 `crate` keyword로 시작할 수 있음
 - 모듈 트리에서 `eat_at_restaurant` 함수가 정의된 모듈과 같은 수준의 모듈인 `front_of_house` 부터 상대 경로 시작
+- 절대 경로와 상대 경로 중 어떤 것을 사용할 것인지는 **_'아이템을 정의하는 코드를 별도로 관리할 것인지, 아니면 함께 관리할 것인지'_** 에 따라 갈림
+- 해당 코드는 **_접근성 문제_** 로 컴파일되지 않기에 오작성된 코드임
+
+#### **🤔 `pub` keyword로 경로 공개하기**
+- `접근성(privacy)` : 외부 코드가 알 수 없고, 호출할 수 없고, 의존할 수 없는 상세 구현을 캡슐화하는 방법
+  - 함수나 구조체를 비공개로 정의하려면 모듈 내에 정의
+- 러스트의 모든 아이템(함수, 메서드, 구조체, 열거자, 모듈, 상수 등)은 기본적으로 **비공개**
+  - 부모 모듈의 아이템들은 자식 모듈 안의 비공개 아이템을 사용할 수 없지만, 자식 모듈의 아이템은 부모 모듈의 아이템을 사용할 수 있음
+    - 자식 모듈은 자신의 상세 구현을 감싸 숨기는 방면, 자식 모듈은 부모 모듈의 아이템이 정의된 컨텍스트를 볼 수 있음
+- `pub` keyword를 이용하면 자식 모듈의 일정 부분을 외부의 부모 모듈에 공개할 수 있음
+
+```rust
+// src/lib.rs
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+pub fn eat_at_restaurant() {
+    // 절대 경로
+    crate::front_of_house::hosting::add_to_waitlist();
+
+    // 상대 경로
+    front_of_house::hosting::add_to_waitlist();
+}
+```
+- 모듈의 `pub` keyword는 부모 모듈이 하위 모듈을 참조할 수 있게만 할 뿐임
+- 접근성 규칙은 구조체, 열거자, 함수, 메서드는 물론 모듈에도 적용됨
+
+#### **🤔 `super` 로 시작하는 상대 경로**
+- 상대 경로는 `super` keyword를 이용해 부모 모듈부터 시작할 수 있음
+  - 파일 시스템 경로에서 `..` 문법을 이용하는 것과 같음
+
+```rust
+fn serve_order() {}
+
+mod back_of_house {
+    fn fix_incorrect_order() {
+        cook_order();
+        super::serve_order();
+    }
+
+    fn cook_order() {}
+}
+```
+- `fix_incorrect_order` 함수는 `back_of_house` 모듈에 정의되어 있음
+- `super` keyword는 `back_of_house` 모듈의 부모 모듈, 즉 루트 모듈인 `crate` 에 접근하여 `serve_order` 함수를 찾을 수 있음
+- `super` keyword를 이용하면 나중에 코드를 다른 모듈로 이동해도 수정해야 할 코드를 최소화할 수 있음
+
+#### **🤔 구조체와 열거자 공개하기**
+- 구조체를 정의할 때 `pub` keyword를 사용한다면 구조체는 공개되지만, 구조체의 필드는 비공개임
+  - 필요에 따라 각 필드를 공개하거나 비공개로 유지
+
+```rust
+mod back_of_house {
+    pub struct Breakfast {
+        pub toast: String,
+        seasonal_fruit: String,
+    }
+
+    impl Breakfast {
+        pub fn summer(toast: &str) -> Breakfast {
+            Breakfast {
+                toast: String::from(toast),
+                seasonal_fruit: String::from("사과"),
+            }
+        }
+    }
+}
+
+fn eat_at_restaurant() {
+    let mut meal = back_of_house::Breakfast::summer("호밀빵");
+    meal.toast = String::from("밀빵");
+    println!("Give me {} toast, please.", meal.toast);
+
+    // 주석 제거 후 컴파일 시 에러 발생
+    // meal.seasonal_fruit = String::from("딸기");
+}
+```
+- `back_of_house::Breakfast` 구조체의 `toast` 필드는 공개이므로 `eat_at_restaurant` 함수가 `.` 을 이용해 `toast` 값을 읽고 쓸 수 있음
+- `seasonal_fruit` 필드는 비공개이므로 `eat_at_restaurant` 함수가 접근할 수 없음
+- `back_of_house::Breakfast` 구조체는 비공개 필드를 가지므로 구조체의 인스턴스를 생성할 수 있는 공개용 연관 함수를 제공해야 함
+  - 만일 연관 함수가 제공되지 않는다면 비공개 필드의 값을 설정할 수 없으므로 구조체의 인스턴스를 생성할 수 없음
+
+```rust
+mod back_of_house {
+    pub enum Appetizer {
+        Soup,
+        Salad,
+    }
+}
+
+pub fn eat_at_restaurant() {
+    let order1 = back_of_house::Appetizer::Soup;
+    let order2 = back_of_house::Appetizer::Salad;
+}
+```
+- 열거자는 공개하면 모든 열것값 또한 공개됨
+  - 모든 열것값이 공개되지 않으면 열거자를 공개하는 의미가 없기 때문
+
+### **4️⃣ `use` keyword로 경로를 범위로 가져오기**
+- `use` keyword로 경로를 현재 범위로 가져오면 경로의 아이템이 마치 현재 범위의 아이템인 것처럼 호출할 수 있음
+
+```rust
+mod first_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+use crate::first_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+}
+```
+- `use` keyword와 경로를 추가하는 것은 파일 시스템에서 `심볼릭 링크(symbolic link)` 를 생성하는 것과 유사함
+- `use` keyword를 이용해 범위로 가져온 경로도 다른 경로와 마찬가지로 접근성 검사를 실행함
+
+```rust
+mod first_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+use self::first_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+}
+```
+- `use` keyword에 상대 경로를 지정하는 것은 현재 범위의 이름부터 시작하는 대신 `self` keyword를 이용한 경로를 사용해야 함
+
+#### **🤔 관용적인 경로 사용하기**
+- `use self::first_of_house::hosting;`
+  - 관용적임
+- `use self::first_of_house::hosting::add_to_waitlist;`
+  - 관용적이지 않음
+- 함수의 부모 모듈을 범위로 가져온 후 부모 모듈의 이름과 함수의 이름을 조합해서 호출하면 함수 경로의 반복을 최소화하면서도 이 함수가 로컬에 정의된 것이 아니라는 점을 더 명확히 할 수 있음
+
+```rust
+use std::collections::HashMap;
+
+fn main() {
+    let mut map = HashMap::new();
+    map.insert(1, 2);
+}
+```
+- 구조체, 열거자, 혹은 기타 다른 아이템을 `use` 구문으로 가져올 때는 전체 경로를 사용하는 것이 관용적임
+
+```rust
+use std::io; // => fmt::Result
+use std::fmt; // => io::Result<()>
+```
+- `use` 구문을 이용해 같은 이름을 가진 두 아이템을 현재 범위로 가져오는 것은 러스트가 지원하지 않음
+- 해당 코드처럼 부모 모듈을 사용하면 두 `Result` 타입을 구분할 수 있음
+- `use std::io::Result` 와 `use std::fmt::Result` 구문을 사용했다면 두 `Result` 타입이 같은 범위에 있기 때문에 어느 부모 모듈에 정의된 것을 가리키는지 이해할 수 없음
+
+#### **🤔 `as` keyword로 새로운 이름 부여하기**
+- `use` 구문으로 같은 이름을 가진 두 타입을 현재 범위로 가져오려면 경로 뒤에 `as` keyword를 이용해 해당 타입에 새로운 이름을 부여하면 됨
+
+```rust
+use std::io::Result;
+use std::fmt::Result as FmtResult;
+```
+- `std::fmt::Result` 타입에 `FmtResult` 라는 이름을 부여함으로써 이름 충돌 없이 범위로 가져옴
+
+#### **🤔 `pub use` keyword로 이름을 다시 내보내기**
+- `use` keyword를 이용해 범위로 이름을 가져오면 이 이름은 새 범위에서 비공개 이름이 됨
+- 호출하는 코드가 다른 범위에서 가져온 이름도 현재 범위에 정의된 것처럼 접근할 수 있도록 하고자 한다면 `pub` 와 `use` keyword를 조합하면 됨
+  - `다시 내보내기 (re-exporting)`
+- `다시 내보내기` 는 다른 개발자가 생각하는 코드의 호출 방식과 실제 코드의 내부 구조가 다를 때 유용함
+  - 코드의 내부 구조를 유지하면서 외부에는 다른 구조로 코드를 노출할 수 있음
+  - 라이브러리를 작업하는 프로그래머 입장에서 원하는 구조를 유지하면서도 라이브러리를 호출하는 프로그래머에게 편리한 구조를 노출할 수 있음
+
+```rust
+mod first_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+pub use crate::first_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+    hosting::add_to_waitlist();
+}
+```
+- `pub use` 구문을 사용하지 않으면 `eat_at_restaurant` 코드는 `hosting::add_to_waitlist` 함수를 호출할 수 있지만, 외부의 코드는 이 함수를 호출할 수 없음
+
+#### **🤔 외부 패키지의 사용**
