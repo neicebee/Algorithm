@@ -362,4 +362,266 @@ let ans = &s[0];
 <br>
 
 #### **🤔 문자열 슬라이스 하기**
-- 
+- 문자열에 대한 인덱싱 작업은 상황에 따라 결과 타입이 하나의 바이트값, 하나의 문자, 하나의 그래핌 클래스터 혹인 하나의 문자열 슬라이스 중 하나가 될 수 있어 명확하지 않음
+- 인덱스를 이용해 문자열 슬라이스를 생성하려면 `[]` 를 이용해 문자열 슬라이스에 저장할 **_특정 바이트_** 의 범위를 명확히 지정해야 함
+
+```rust
+fn main() {
+    let s = String::from("안녕하세요");
+    println!("{}", &s[0..3]);
+}
+// Result
+// 안
+```
+- 변수 s는 문자열의 처음 3bytes 값을 저장하는 `&str` 타입
+- `&s[0..1]` 로 코드를 작성하게 되면 벡터에 유효하지 않은 인덱스로 접근할 때와 동일하게 패닉이 발생하게 됨
+
+#### **🤔 문자열을 순회하는 메서드**
+
+```rust
+fn main() {
+    let s = String::from("안녕하세요");
+    for c in s.chars() {
+        println!("{c}");
+    }
+}
+// Result
+// 안
+// 녕
+// 하
+// 세
+// 요
+```
+- 개별 유니코드 스칼라값을 조작해야 한다면 `chars` 메서드 사용
+- 유효한 유니코드 스칼라값은 1byte보다 큰 값으로 구성됨
+- `chars` 메서드는 문자열을 `char` 타입으로 분리함
+
+```rust
+fn main() {
+    let s = String::from("안녕하세요");
+    for b in s.bytes() {
+        println!("{b}");
+    }
+}
+```
+- `bytes` 메서드는 문자열의 각 바이트를 리턴함
+
+<br>
+
+### **3️⃣ 키와 값을 저장하는 해시 맵**
+- `HashMap<K, V>` 타입은 `K` 타입의 키에 `V` 타입의 값을 매핑하여 저장
+- 유사한 형태의 데이터 구조
+  - 해시, 맵, 객체, 해시 테이블(hash table), 딕셔너리(dictionary), 연관 배열(associative array) 등
+- 해시 맵은 벡터처럼 인덱스를 이용하는 것이 아니라 어떤 타입이든 관계없이 키를 이용하여 데이터를 조회하고자 할 때 유용
+
+#### **🤔 새로운 해시 맵 생성하기**
+
+```rust
+use std::collections::HashMap;
+
+fn main() {
+    let mut scores = HashMap::new();
+    scores.insert(
+        String::from("Blue"),
+        20
+    );
+    scores.insert(
+        String::from("Yellow"),
+        50
+    );
+
+    println!("{:#?}", scores);
+}
+// Result
+// {
+//     "Yellow": 50,
+//     "Blue": 20,
+// }
+```
+- `new` 함수로 빈 해시 맵 생성
+- `insert` 함수로 새로운 키와 값을 추가
+- 해시 맵은 사용빈도가 낮아 프렐류드를 통해 자동으로 현재 범위로 가져오는 기능이 포함되어 있지 않으며, 표준 라이브러리의 지원도 빈약함
+- 해시 맵은 벡터와 마찬가지로 데이터를 힙 메모리에 저장하며, 모든 키와 모든 값의 타입이 같아야 함
+
+```rust
+use std::collections::HashMap;
+
+fn main() {
+    let teams = vec![
+        String::from("Blue"),
+        String::from("Yellow")
+    ];
+    let score = vec![20, 50];
+
+    let scores: HashMap<_, _> = teams.iter()
+        .zip(score.iter()).collect();
+
+    println!("{:#?}", scores);
+}
+// Result
+// {
+//     "Blue": 20,
+//     "Yellow": 50,
+// }
+```
+- 키와 값을 가지고 있는 튜플의 벡터에 대해 `collect` 메서드를 호출
+- `collect` 메서드
+  - 여러 가지 종류의 컬렉션으로부터 데이터를 수집함
+  - 여러 가지 데이터 구조를 생성할 수 있으므로 그 중 어떤 타입을 생성할 것인지 명시하는 타입 애노테이션 필요
+- 타입 애노테이션 중 매개변수에 대해서 `밑줄(_)` 을 사용하여 벡터의 데이터 타입을 이용해 키와 값의 타입을 알아서 유추할 수 있도록 함
+
+```rust
+fn main() {
+    let teams = vec![
+        String::from("Blue"),
+        String::from("Yellow")
+    ];
+    let score = vec![20, 50];
+
+    let scores = teams.iter().zip(score.iter());
+
+    for i in scores {
+        println!("{:#?}", i);
+    }
+}
+// Result
+// (
+//     "Blue",
+//     20,
+// )
+// (
+//     "Yellow",
+//     50,
+// )
+```
+- `zip` 메서드로는 튜플의 벡터를 생성할 수 있음
+
+#### **🤔 해시 맵과 소유권**
+- `i32` 처럼 `Copy` 트레이트를 구현하는 타입은 값들이 해시 맵으로 복사됨
+- `String` 처럼 값을 소유하는 타입은 값이 해시 맵으로 이동하며, 해시 맵이 그 값들의 소유권을 갖게 됨
+- 해시 맵에 값의 참조를 추가하면 그 값은 해시 맵으로 이동하지 않음
+  - 참조가 가리키는 값은 해시 맵이 유효한 범위에 있는 동안 함께 유효해야 함
+
+#### **🤔 해시 맵의 값에 접근하기**
+
+```rust
+use std::collections::HashMap;
+
+fn main() {
+    let mut scores = HashMap::new();
+
+    scores.insert(String::from("Blue"), 20);
+    scores.insert(String::from("Yellow"), 50);
+
+    let score = scores.get(
+        &String::from("Blue")
+    );
+
+    println!("{:#?}", score);
+}
+// Result
+// Some(
+//     20,
+// )
+```
+- `get` 메서드에 키를 전달하면 값에 접근 가능
+- `get` 메서드는 `Option<&V>` 타입을 리턴함
+  - 즉, 해시 맵의 키에 대한 값이 존재하지 않으면 `None` 을 리턴
+
+```rust
+use std::collections::HashMap;
+
+fn main() {
+    let mut scores = HashMap::new();
+
+    scores.insert(String::from("Blue"), 20);
+    scores.insert(String::from("Yellow"), 50);
+
+    for (key, value) in &scores {
+        println!("{key} : {value}");
+    }
+}
+// Result
+// Yellow : 50
+// Blue : 20
+```
+- `for` 루프를 이용한 해시 맵 키와 값의 쌍 순회 출력
+- 해시 맵의 키와 값의 쌍을 **_임의의 순서_** 로 출력함
+
+#### **🤔 해시 맵 수정하기**
+- 해시 맵의 각 키에는 오직 하나의 값만 할당할 수 있음
+
+<br>
+
+**(1)** 값 덮어쓰기
+- 해시 맵에 키와 값을 추가한 후 같은 키에 다른 값을 추가하면 키에 할당되었던 값이 교체됨
+
+<br>
+
+**(2)** 키에 값이 할당되어 있지 않을 때만 추가하기
+- 해시 맵은 값의 할당 여부를 확인할 키를 매개변수로 사용하는 `entry` 라는 특별한 API를 제공함
+- `entry` 메서드의 리턴값은 값이 존재하는지 알려주는 `Entry` 열거자임
+
+```rust
+use std::collections::HashMap;
+
+fn main() {
+    let mut scores = HashMap::new();
+
+    scores.insert(String::from("Blue"), 20);
+
+    scores.entry(String::from("Yellow")).or_insert(50);
+    scores.entry(String::from("Blue")).or_insert(50);
+
+    println!("{:#?}", scores);
+}
+// Result
+// {
+//     "Blue": 20,
+//     "Yellow": 50,
+// }
+```
+- `Entry` 열거자의 `or_insert` 메서드는 키가 존재하면 그 키에 연결된 값에 대한 가변 참조를 리턴
+  - 존재하지 않을 시 매개변수로 전달한 키에 새로운 값을 추가한 후 이 새 값에 대한 가변 참조 리턴
+
+<br>
+
+**(3)** 기존 값에 따라 값 수정하기
+
+```rust
+use std::collections::HashMap;
+
+fn main() {
+    let s = "hello world pretty wonderful world";
+    let mut map = HashMap::new();
+
+    for word in s.split(' ') {
+        let count = map.entry(word).or_insert(0);
+        *count += 1;
+    }
+
+    println!("{:#?}", map);
+}
+// Result
+// {
+//     "wonderful": 1,
+//     "pretty": 1,
+//     "hello": 1,
+//     "world": 2,
+// }
+```
+- 텍스트 안에서 각 단어가 몇 번 사용되었는지 세는 코드
+- `or_insert` 메서드는 `키에 할당된 값에 대한 가변 참조(&mut V)` 를 리턴
+  - 해당 가변 참조를 count 변수에 저장했으므로 이 변수에 새 값을 할당하려면 `애스터리스크(*)` 를 이용해 count 변수를 역참조해야 함
+  - 가변 참조는 `for` 루프가 끝나면 범위 밖으로 나가게 되므로 값 대여 규칙을 위반하지 않으며 안전하게 값을 변경할 수 있음
+
+<br>
+
+#### **🤔 해시 함수**
+- 해시 맵은 암호학적으로 강력한 해시 함수를 이용하여 `서비스 거부(DoS, Denial of Service)` 공격을 방지할 수 있음
+- 가장 빠른 해싱 알고리즘을 사용하지는 않지만, 어느 정도의 성능을 희생하면서 보안을 향상시키는 것은 필요함
+
+<br>
+
+## **Summary**
+- 벡터, 문자열, 해시 맵은 대부분 프로그램이 데이터를 저장하고 읽고 수정하는 데 필요한 방대한 기능을 제공함
