@@ -1,13 +1,7 @@
-use std::collections::HashMap;
-
 fn main() {
-    let s = "hello world pretty wonderful world";
-    let mut map = HashMap::new();
-
-    for word in s.split(' ') {
-        let count = map.entry(word).or_insert(0);
-        *count += 1;
+    let v = vec!["일", "이", "삼", "사", "오"];
+    
+    for (i, v) in v.iter().enumerate() {
+        println!("{i} {v}");
     }
-
-    println!("{:#?}", map);
 }
