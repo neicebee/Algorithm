@@ -19,8 +19,16 @@ pub mod operations {
         n
     }
 
+    // 중간값을 구하는 함수
+    pub fn get_mid(nums: &Vec<i32>) -> Option<i32> {
+        if nums.len() == 0 { return None; }
+
+        Some(nums[nums.len()/2])
+    }
+
     // 최빈값을 구하는 함수
     pub fn get_mode(nums: &Vec<i32>) -> Vec<i32> {
+        if nums.len() == 0 { return Vec::new(); }
         // nums의 요소들의 빈도수를 매치하는 HashMap 인스턴스
         let mut map = HashMap::new();
         // 최빈값을 골라내 저장할 용도인 HashMap 인스턴스
@@ -45,16 +53,26 @@ pub mod operations {
             // 해당 컬렉션이 비어있는지를 bool 타입으로 반환하는 is_empty 메서드
             // 때문에 match 표현식 사용
             match result.is_empty() {
-                // result가 비어있을 경우 현재 키와 값을 insert 후 tmp에 키를 저장
+                // result가 비어있을 경우 현재 키와 값을 insert 후 포인터 역할을 하는 tmp에 키를 저장
                 true => {
                     result.insert(*key, value);
                     tmp = *key;
                 },
+                // result가 비어있지 않을 경우 tmp에 저장되어 있는 키를 이용해 값 호출 및 비교
                 false => {
+                    // HashMap의 get 메서드는 Option 열거자를 반환함
+                    // 때문에 match 표현식 사용
                     match result.get(&tmp) {
+                        // tmp에 저장되어 있는 키로 값을 찾을 수 있다면 tmp2에는 tmp에 상응하는 값을 저장
                         Some(n) => { tmp2 = *n; },
                         None => { },
                     }
+
+                    // 만약 현재 value가 tmp2와 같다면 result에 추가한 후 포인터를 다음으로 키로 옮겨줌
+                    // value가 tmp2보다 작다면 최빈값이 될 수 없으므로 아무 작업도 하지 않고 넘어감
+                    // value가 tmp2보다 크다면 그 전까지 저장했던 다른 값들도 현재 value보다 크지 않을 것이므로
+                    // HashMap을 초기화하는 clear 메서드를 수행 후 해당 키와 값을 추가함
+                    // tmp2는 제일 큰 값만 저장하므로 해당 값으로 수정함
                     if value == tmp2 {
                         result.insert(*key, value);
                         tmp = *key;
@@ -68,23 +86,21 @@ pub mod operations {
                 },
             }
         }
+        // 우리는 최빈값이 필요하지 얼마나 나왔는지는 중요하지 않으므로 into_keys 메서드로 키만 추출
+        // 추출 후 collect 메서드로 묶어줌
         result.into_keys().collect()
     }
 
-    pub fn get_avg(nums: &Vec<i32>) -> f64 {
+    // 평균값을 구하는 함수
+    pub fn get_avg(nums: &Vec<i32>) -> Option<f64> {
+        if nums.len() == 0 { return None; }
+        // 전체 합을 저장하는 변수
         let mut tmp: i32 = 0;
-        let mut count = 0;
-        let mut avg: f64 = 0.0;
         
         for i in nums {
             tmp += i;
-            count += 1;
-            if i == &nums[nums.len()-1] {
-                avg = f64::from(tmp);
-                avg = avg/f64::from(count);
-            }
         }
     
-        avg
+        Some(tmp as f64 / nums.len() as f64)
     }
 }
