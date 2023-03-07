@@ -1,12 +1,14 @@
-use std::fs::File;
+use std::{fs::File, io::ErrorKind};
 
 fn main() {
-    let f = File::open("hello.txt");
-
-    let f = match f {
+    let f = match File::open("hello.txt") {
         Ok(file) => file,
-        Err(error) => {
-            panic!("File Open Error: {:?}", error);
-        }
+        Err(ref error) => match error.kind() {
+            ErrorKind::NotFound => match File::create("hello.txt") {
+                Ok(fc) => fc,
+                Err(e) => panic!("File create error!: {:?}", e),
+            },
+            others => panic!("File open error!: {:?}", others),
+        },
     };
 }

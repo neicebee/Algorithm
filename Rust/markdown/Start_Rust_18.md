@@ -86,10 +86,47 @@ fn main() {
             panic!("File Open Error: {:?}", error);
         }
     };
-
 }
 ```
 - match 표현식으로 Result 타입의 리턴값을 제어하는 코드
 - `Option` 열거자와 마찬가지로 `Result` 열거자도 프렐류드에 의해 자동으로 추가됨
 
 #### **🤔 `match` 표현식으로 여러 종류의 에러 처리하기**
+
+```rust
+use std::{fs::File, io::ErrorKind};
+
+fn main() {
+    let f = File::open("hello.txt");
+
+    let f = match f {
+        Ok(file) => file,
+        Err(ref error) => match error.kind() {
+            ErrorKind::NotFound => match File::create("hello.txt") {
+                Ok(fc) => fc,
+                Err(e) => panic!("File create error!: {:?}", e),
+            },
+            others => panic!("File open error!: {:?}", others),
+        },
+    };
+}
+```
+- 중첩된 `match` 표현식을 이용해 에러의 종류에 따라 다르게 처리하기
+  - `File::open` 메서드가 리턴하는 `Err` 열것값에 저장된 값의 타입은 `io::Error` 타입
+  - `io::Error` 구조체는 `io::ErrorKind` 타입을 리턴하는 `kind` 메서드 제공
+  - `ErrorKind::NotFound` : 존재하지 않는 파일을 열고자 할 때 발생하는 열것값
+  - `error.kind()` 가 리턴한 값이 `ErrorKind::NotFound` 열것값일 때 파일 생성
+  - 파일 생성이 실패할 경우를 대비해 `match` 표현식에 가지를 추가함
+  - `ErrorKind::NotFound` 에러를 제외한 다른 에러일 경우 프로그램이 패닉에 빠짐
+
+#### **🤔 에러 발생 시 패닉을 발생하는 더 빠른 방법: `unwrap` 과 `expect`**
+- `Result<T, E>` 타입은 다양한 작업을 처리하기 위한 `unwrap` 메서드와 `expect` 메서드 제공
+  - `unwrap` 메서드
+    - 중첩된 `match` 표현식과 정확히 같은 동작을 하는 `단축(shortcut)` 메서드
+    - `Result` 타입이 `Ok` 열것값일 때 `Ok` 열것값에 저장된 값 리턴
+    - `Result` 타입이 `Err` 열것값일 때는 `panic!` 매크로 호출
+  - `expect` 메서드
+    - `unwrap` 메서드와 유사하지만 `panic!` 매크로에 에러 메시지 전달 가능
+    - 개발자의 의도를 더 명확하게 표현하는 동시에 패닉이 발생한 원인을 더 쉽게 추적 가능
+
+#### **🤔 에러 전파하기**
