@@ -496,7 +496,7 @@ fn main(){
 
 [Question_Link - 25083](https://www.acmicpc.net/problem/25083)
 
-## Basic Code
+### Basic Code
 
 ```rust
 fn main(){
@@ -506,5 +506,53 @@ r`-_   ,'  ,/
    `~\/
       |
       |"#);
+}
+```
+
+<br>
+
+------------------ 2023.03.12 추가 문제 ------------------
+
+<br>
+
+## JeongMin
+
+[Question_Link - 11382](https://www.acmicpc.net/problem/11382)
+
+### Basic Code - 1
+
+```rust
+use std::io;
+
+fn main() {
+    let mut number = String::new();
+    io::stdin().read_line(&mut number).unwrap();
+    let nums: Vec<u64> = number.trim().split(' ')
+        .map(
+            |x| x.parse().unwrap()
+        ).collect();
+    println!("{}", nums[0]+nums[1]+nums[2]);
+}
+```
+
+### Basic Code - 2
+
+```rust
+use std::io;
+
+fn main() {
+    let mut number = String::new();
+    let mut tmp = 0;
+    io::stdin().read_line(&mut number).unwrap();
+    let nums: Vec<u64> = number.trim().split(' ')
+        .map(
+            |x| {
+                match x.parse::<u64>() {
+                    Ok(x) => {tmp+=x; tmp},
+                    Err(_) => 0,
+                }
+            }
+        ).collect();
+    println!("{}", nums[2]);
 }
 ```
