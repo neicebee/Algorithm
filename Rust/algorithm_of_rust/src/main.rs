@@ -1,19 +1,21 @@
 use std::io;
 
 fn main() {
-    let t: Vec<_> = (0..2)
+    let mut buf = String::new();
+    io::stdin().read_line(&mut buf).unwrap();
+    let mut time: Vec<i32> = buf.trim().split(' ')
         .map(
-            |_| {
-                let mut buf = String::new();
-                io::stdin().read_line(&mut buf).unwrap();
-                buf.trim().parse::<i32>().unwrap() > 0
-            }
+            |x| x.parse().unwrap()
         ).collect();
-    let q = match t[..] {
-        [true,true] => 1,
-        [false,true] => 2,
-        [false,false] => 3,
-        _ => 4,
-    };
-    println!("{q}");
+    if time[1]-45 < 0 { 
+        if time[0]-1 < 0 {
+            time[0] = 23;
+        } else {
+            time[0] -= 1; 
+        }
+        time[1] = (time[1]+60)-45;
+    } else {
+        time[1] = time[1]-45;
+    }
+    println!("{} {}", time[0], time[1]);
 }
