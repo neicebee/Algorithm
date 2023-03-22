@@ -207,7 +207,43 @@ fn main() {
 
 ## Oven Clock
 
-[Question_Link - 2525](acmicpc.net/problem/2525)
+[Question_Link - 2525](https://www.acmicpc.net/problem/2525)
+
+### Basic Code
+
+```rust
+use std::io;
+
+fn main() {
+    let mut buf1 = String::new();
+    io::stdin().read_line(&mut buf1).unwrap();
+    let mut t: Vec<i32> = buf1.trim().split(' ')
+        .map(
+            |x| x.parse().unwrap()
+        ).collect();
+    let mut buf2 = String::new();
+    io::stdin().read_line(&mut buf2).unwrap();
+    let c: i32 = buf2.trim().parse().unwrap();
+    
+    if t[1]+c >= 60 {
+        if t[0]+((t[1]+c)/60) > 23 {
+            t[0]+=((t[1]+c)/60)-24;
+        } else {
+            t[0]+=(t[1]+c)/60;
+        }
+        t[1]=(t[1]+c)%60
+    } else {
+        t[1]+=c;
+    }
+    println!("{} {}", t[0], t[1]);
+}
+```
+
+<br>
+
+## Three Dices
+
+[Question_Link - 2480](https://www.acmicpc.net/problem/2480)
 
 ### Basic Code
 
