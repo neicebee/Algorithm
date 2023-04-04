@@ -313,5 +313,9 @@ fn main() {
     print!("{reward}");
 }
 ```
-- [for_each에 대한 official Document](https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.for_each)
-- [zip에 대한 official Document](https://doc.rust-lang.org/std/iter/fn.zip.html)
+
+<br>
+
+[trait_Iterator_method_for_each in Official Document](https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.for_each)
+
+[method_zip in Official Document](https://doc.rust-lang.org/std/iter/fn.zip.html)
