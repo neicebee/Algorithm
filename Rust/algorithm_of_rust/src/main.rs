@@ -7,14 +7,17 @@ fn input() -> String {
     buf
 }
 
-fn split_num() -> Vec<i32> {
-    let s = input();
-    s.split(' ')
-    .map(
-        |x| x.parse().unwrap()
-    ).collect()
-}
 fn main() {
-    let dices = split_num();
-    println!("{:?}", dices);
+    let s = input();
+
+    // 1~6까지의 눈을 가진 주사위 각 한 개씩 생성하는 코드
+    let mut dices = [0; 7];
+    s.split(' ').for_each(|x| dices[x.parse::<usize>().unwrap()] += 1);
+    
+    let reward = match dices.iter().zip(0..7).max().unwrap() {
+        (3, m) => 10000+m*1000,
+        (2, m) => 1000+m*100,
+        (_, m) => m*100,
+    };
+    print!("{reward}");
 }
