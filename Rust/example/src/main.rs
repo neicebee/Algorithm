@@ -1,14 +1,15 @@
-enum Option_i32 {
-    Some(i32),
-    None,
+struct Point<T> {
+    x: T,
+    y: T,
 }
 
-enum Option_f64 {
-    Some(f64),
-    None,
+impl<T> Point<T> {
+    fn x(&self) -> &T {
+        &self.x
+    }
 }
 
 fn main() {
-    let integer = Option_i32::Some(5);
-    let float = Option_f64::Some(8.9);
+    let p = Point{ x: 5, y: 10 };
+    println!("p.x = {}", p.x());
 }
