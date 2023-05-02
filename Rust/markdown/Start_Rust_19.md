@@ -293,3 +293,65 @@ fn main() {
 <br>
 
 ### **3️⃣ 트레이트: 공유 가능한 행위를 정의하는 방법**
+- `트레이트(trait)` : 러스트 컴파일러에게 특정 타입이 어떤 기능을 실행할 수 있으며, 어떤 타입과 이 기능을 공유할 수 있는지를 알려주는 방법
+  - 공유 가능한 행위를 추상화된 방식으로 정의하는 방법
+  - 다른 언어에서 `인터페이스(interface)` 기능과 유사함
+
+#### **🤔 트레이트 선언하기**
+- 트레이트 정의는 어떤 목적을 이루는 데 필요한 일련의 행위를 정의하고 여러 타입에 적용할 메서드 시그니처를 그룹화하는 방법
+- `NewArticle` 구조체는 `story` 필드에 특정 지역의 뉴스 콘텐츠를 저장하며, `Tweet` 구조체는 최대 280글자의 텍스트와 해당 트윗이 새 트윗인지, 리트윗된 트윗인지, 아니면 다른 트윗의 댓글인지를 가리키는 메타데이터를 포함
+- 해당 구조체들의 인스턴스에 저장된 데이터를 요약해서 보여주는 라이브러리 구현
+
+```rust
+// src/lib.rs
+pub trait Summary {
+    fn summarize(&self) -> String;
+}
+```
+- `trait` keyword를 이용한 트레이트 정의와 메서드 시그니처 정의
+- 메서드 시그니처는 각각 별개의 줄에 선언하며 각 줄은 세미콜론으로 끝나야 함
+  - 해당 트레이트를 구현하는 각 타입은 반드시 이 메서드의 본문에 자신의 행위를 구현해야 함
+
+#### **🤔 타입에 트레이트 구현하기**
+
+```rust
+// src/lib.rs
+pub trait Summary {
+    fn summarize(&self) -> String;
+}
+
+pub struct NewsArticle {
+    pub headline: String,
+    pub location: String,
+    pub author: String,
+    pub content: String,
+}
+
+pub struct Tweet {
+    pub username: String,
+    pub content: String,
+    pub reply: String,
+    pub retweet: String,
+}
+
+impl Summary for NewsArticle {
+    fn summarize(&self) -> String {
+        format!(
+            "{}, by {}, {}", 
+            self.headline, self.author, self.location
+        )
+    }
+}
+
+impl Summary for Tweet {
+    fn summarize(&self) -> String {
+        format!(
+            "{}: {}", 
+            self.username, self.content
+        )
+    }
+}
+```
+- `Summary` 트레이트를 이용해 필요한 행위 정의
+- 타입에 트레이트를 구현하는 것은 보통의 메서드 구현과 유사함
+- `impl` 블록에서 메서드 시그니처를 추가하고 해당 타입에 대해 수행해야 할 특정 동작을 구현
