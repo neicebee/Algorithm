@@ -1,5 +1,8 @@
 pub trait Summary {
-    fn summarize(&self) -> String;
+    fn summarize_author(&self) -> String;
+    fn summarize(&self) -> String {
+        format!("{}님의 기사 더 읽기", self.summarize_author())
+    }
 }
 
 pub struct NewsArticle {
@@ -12,24 +15,12 @@ pub struct NewsArticle {
 pub struct Tweet {
     pub username: String,
     pub content: String,
-    pub reply: String,
-    pub retweet: String,
-}
-
-impl Summary for NewsArticle {
-    fn summarize(&self) -> String {
-        format!(
-            "{}, by {}, {}", 
-            self.headline, self.author, self.location
-        )
-    }
+    pub reply: bool,
+    pub retweet: bool,
 }
 
 impl Summary for Tweet {
-    fn summarize(&self) -> String {
-        format!(
-            "{}: {}", 
-            self.username, self.content
-        )
+    fn summarize_author(&self) -> String {
+        format!("@{}", self.username)
     }
 }

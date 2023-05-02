@@ -330,8 +330,8 @@ pub struct NewsArticle {
 pub struct Tweet {
     pub username: String,
     pub content: String,
-    pub reply: String,
-    pub retweet: String,
+    pub reply: bool,
+    pub retweet: bool,
 }
 
 impl Summary for NewsArticle {
@@ -355,3 +355,137 @@ impl Summary for Tweet {
 - `Summary` 트레이트를 이용해 필요한 행위 정의
 - 타입에 트레이트를 구현하는 것은 보통의 메서드 구현과 유사함
 - `impl` 블록에서 메서드 시그니처를 추가하고 해당 타입에 대해 수행해야 할 특정 동작을 구현
+
+```rust
+// src/main.rs
+use trait_example::*;
+
+fn main() {
+    let tweet = Tweet {
+        username: String::from("f1r3_r41n"),
+        content: String::from("트레이트 구현 단계 ing.."),
+        reply: false,
+        retweet: false,
+    };
+
+    println!("새 트윗 1개: {}", tweet.summarize());
+}
+// Result
+// 새 트윗 1개: f1r3_r41n: 트레이트 구현 단계 ing..
+```
+- `NewsArticle` 타입, `Tweet` 타입, `Summary` 트레이트는 `lib.rs` 파일 하나에 모두 정의했으므로 모두 같은 범위에 존재함
+- 만약 별개의 라이브러리 범위에 정의된 구조체에 `Summary` 트레이트를 구현하고자 함
+  - 전체 경로를 명시하여 자신이 정의한 타입에 `Summary` 트레이트 구현
+  - 때문에 공개 트레이트로 선언하였음
+- 트레이트 구현 시 한 가지 제약
+  - 트레이트나 트레이트를 구현할 타입이 현재 크레이트의 로컬 타입이어야 함
+    - `Display` 같은 표준 라이브러리의 트레이트를 자신의 크레이트 일부인 `Tweet` 타입에 구현할 수 있는 이유는 `Tweet` 타입이 자신의 크레이트의 로컬 타입이기 때문
+    - `Summary` 트레이트는 자신의 크레이트의 로컬 타입이므로 `Vec<T>` 타입에 `Summary` 트레이트를 구현할 수 있음
+  - 외부 타입에 외부 트레이트를 구현할 수 없음
+    - `Display` 와 `Vec<T>` 는 모두 표준 라이브러리에 정의된 타입이며 자신의 크레이트의 로컬 타입이 아니기 때문에 자신의 크레이트 안에서 `Vec<T>` 타입에 `Display` 트레이트를 구현할 수 없음
+  - `통일성(coherence)` 혹은 `고아 규칙(orphan rule)` 이라고 칭함
+
+#### **🤔 기본 구현**
+- 트레이트에 선언된 모든 메서드를 구현하도록 요구하는 것보다 일부 혹은 전체 메서드의 기본 동작을 구현해 주면 특정 타입에 구현할 때 메서드의 기본 구현을 그대로 사용하거나 재정의할 수 있음
+
+```rust
+// src/lib.rs
+pub trait Summary {
+    fn summarize(&self) -> String {
+        String::from("(계속 읽기)")
+    }
+}
+
+pub struct NewsArticle {
+    pub headline: String,
+    pub location: String,
+    pub author: String,
+    pub content: String,
+}
+
+pub struct Tweet {
+    pub username: String,
+    pub content: String,
+    pub reply: bool,
+    pub retweet: bool,
+}
+
+impl Summary for NewsArticle { }
+
+impl Summary for Tweet {
+    fn summarize(&self) -> String {
+        format!(
+            "{}: {}", 
+            self.username, self.content
+        )
+    }
+}
+```
+- `Summary` 트레이트 정의 블록에서 `summarize` 메서드의 기본 구현을 제공
+- `NewsArticle` 구조체에서 `summarize` 메서드를 정의하지 않거나 재정의하지 않으면 기본 구현이 제공됨
+
+```rust
+// src/main.rs
+use trait_example::*;
+
+fn main() {
+    let article = NewsArticle {
+        headline: String::from("headline"),
+        location: String::from("korea"),
+        author: String::from("f1r3_r41n"),
+        content: String::from("text..."),
+    };
+
+    println!("새로운 기사: {}", article.summarize());
+}
+// Result
+// 새로운 기사: (계속 읽기)
+```
+- `Tweet` 구조체의 `summarize` 메서드는 재정의된 구현이 제공됨
+- 기본 구현을 재정의하기 위한 문법은 기본 구현을 제공하지 않는 트레이트의 메서드를 구현하는 문법과 같음
+
+```rust
+// src/lib.rs
+pub trait Summary {
+    fn summarize_author(&self) -> String;
+    fn summarize(&self) -> String {
+        format!("{}님의 기사 더 읽기", self.summarize_author())
+    }
+}
+
+pub struct Tweet {
+    pub username: String,
+    pub content: String,
+    pub reply: bool,
+    pub retweet: bool,
+}
+
+impl Summary for Tweet {
+    fn summarize_author(&self) -> String {
+        format!("@{}", self.username)
+    }
+}
+```
+- 기본 구현은 같은 트레이트의 다른 메서드도 호출 가능
+  - 다른 메서드가 기본 구현을 제공하지 않아도 가능
+
+```rust
+// src/main.rs
+use trait_example::*;
+
+fn main() {
+    let tweet = Tweet {
+        username: String::from("f1r3_r41n"),
+        content: String::from("트레이트 구현 단계 ing.."),
+        reply: false,
+        retweet: false,
+    };
+
+    println!("새 트윗 1개: {}", tweet.summarize());
+}
+// Result
+// 새 트윗 1개: @f1r3_r41n님의 기사 더 읽기
+```
+- 같은 메서드를 재정의하면서 기본 구현 코드를 호출할 수는 없음
+
+#### **🤔 트레이트 매개변수**
