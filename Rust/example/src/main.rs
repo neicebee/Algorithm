@@ -1,21 +1,19 @@
-#[derive(Debug)]
-struct Point<T, U> {
-    x: T,
-    y: U,
-}
+fn get_max<T: PartialOrd + Copy>(list: &[T]) -> T {
+    let mut max = list[0];
 
-impl<T, U> Point<T, U> {
-    fn struct_mix<V, W> (self, other: Point<V, W>) -> Point<T, W> {
-        Point {
-            x: self.x,
-            y: other.y,
+    for &i in list.iter() {
+        if i > max {
+            max = i;
         }
     }
+
+    max
 }
 
 fn main() {
-    let p1 = Point { x: 4.5, y: 7 };
-    let p2 = Point { x: "Hello", y: "world!" };
+    let num_list = vec![34, 56, 77, 25, 100, 54];
+    let char_list = vec!['y', 'm', 'a', 'q'];
 
-    println!("{:?}", p1.struct_mix(p2));
+    println!("max: {}", get_max(&num_list));
+    println!("max: {}", get_max(&char_list));
 }

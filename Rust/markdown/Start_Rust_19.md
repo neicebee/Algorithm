@@ -489,3 +489,163 @@ fn main() {
 - 같은 메서드를 재정의하면서 기본 구현 코드를 호출할 수는 없음
 
 #### **🤔 트레이트 매개변수**
+
+```rust
+// src/lib.rs
+pub trait Summary {
+    fn summarize(&self) -> String;
+}
+
+pub struct NewsArticle {
+    pub headline: String,
+    pub location: String,
+    pub author: String,
+    pub content: String,
+}
+
+pub struct Tweet {
+    pub username: String,
+    pub content: String,
+    pub reply: bool,
+    pub retweet: bool,
+}
+
+impl Summary for NewsArticle {
+    fn summarize(&self) -> String {
+        format!(
+            "{}, by {}, {}",
+            self.headline, self.author, self.location
+        )
+    }
+}
+
+impl Summary for Tweet {
+    fn summarize(&self) -> String {
+        format!(
+            "{}: {}",
+            self.username, self.content
+        )
+    }
+}
+
+pub fn notify(item: impl Summary) {
+    println!("속보! {}", item.summarize());
+}
+
+// src/main.rs
+use trait_example::*;
+
+fn main() {
+    let article = NewsArticle {
+        headline: String::from("headline"),
+        location: String::from("korea"),
+        author: String::from("f1r3_r41n"),
+        content: String::from("text..."),
+    };
+
+    println!("새로운 기사: {}", article.summarize());
+    notify(article);
+}
+// Result
+// 새로운 기사: headline, by f1r3_r41n, korea
+// 속보! headline, by f1r3_r41n, korea
+```
+- `impl Trait` 문법 : 지정된 트레이트를 구현하는 모든 타입을 인수로 전달할 수 있음
+  - 비교적 간단한 경우에는 잘 동작
+  - 트레이트 경계라고 부르는 더 긴 문법을 간단히 표현하기 위한 편의 장치
+
+<br>
+
+**(1)** 트레이트 경계 문법
+
+```rust
+pub fn notify<T: Summary>(item: T) {
+    println!("속보! {}", item.summarize());
+}
+```
+- 트레이트 경계 문법 : 제네릭 타입 매개변수를 선언하는 꺾쇠괄호 안에 콜론을 이용해 지정
+  - 서로 다른 타입인 두 개의 매개변수 선언 : `impl Trait` 문법
+  - 같은 타입인 두 개의 매개변수 선언 : 트레이트 경계 문법
+
+<br>
+
+**(2)** + 문법으로 여러 트레이트 경계 정의하기
+
+```rust
+pub fn notify(item: impl Summary + Display) {
+```
+- `impl Trait` 문법
+- `notify` 함수에서 `item` 매개변수 값에 출력 형식을 적용하는 동시에 `summarize` 메서드를 호출하고자 할 때 `+` 문법으로 트레이트 구현 명시
+
+```rust
+pub fn notify<T: Summary + Display>(item: T) {
+```
+- 트레이트 경계 문법
+
+**(3)** where 절을 이용해 트레이트 경계 정리하기
+- 여러 개의 제네릭 타입 매개변수를 갖는 함수에는 함수 이름과 매개변수 목록 사이에 너무 많은 트레이트 경계를 나열하게 되어 함수 시그니처를 읽기 어려워짐
+
+```rust
+fn function<T: Display + Clone, U: Clone + Debug>(t: T, u: U) -> i32 {
+```
+- 여러 개의 제네릭 타입 매개변수와 트레이트 경계
+
+```rust
+fn function<T, U>(t: T, u: U) -> i32
+    where T: Display + Clone, U: Clone + Debug {
+```
+- `where` 절을 이용해 간결하게 정리한 코드
+
+<br>
+
+#### **🤔 트레이트를 구현하는 값 리턴하기**
+
+```rust
+fn returns_summarizable() -> impl Summary {
+    Tweet {
+        username: String::from("f1r3_r41n"),
+        content: String::from("트레이트 구현 단계 ing.."),
+        reply: false,
+        retweet: false,
+    }
+}
+```
+- 리턴 타입에 `impl Summary` 를 지정했기에 `Summary` 트레이트를 구현하는 어떤 타입도 리턴할 수 있음
+- 이 함수를 호출하는 코드는 실제 리턴 타입을 알지 못함
+- `impl Trait` 문법은 하나의 타입을 리턴하는 경우에만 사용할 수 있음
+  - 컴파일러가 `impl Trait` 문법을 구현하는 방법의 제약 때문
+
+#### **🤔 트레이트 경계를 이용해 largest 함수 작성하기**
+
+```rust
+fn get_max<T: PartialOrd + Copy>(list: &[T]) -> T {
+    let mut max = list[0];
+
+    for &i in list.iter() {
+        if i > max {
+            max = i;
+        }
+    }
+
+    max
+}
+
+fn main() {
+    let num_list = vec![34, 56, 77, 25, 100, 54];
+    let char_list = vec!['y', 'm', 'a', 'q'];
+
+    println!("max: {}", get_max(&num_list));
+    println!("max: {}", get_max(&char_list));
+}
+// Result
+// max: 100
+// max: y
+```
+- `>` 연산자는 표준 라이브러리의 `std::cmp::PartialOrd` 트레이트의 기본 메서드로 정의되어 있음
+  - `T` 타입에 `PartialOrd` 트레이트 경계를 지정하여 함수가 실제로 비교할 수 있는 타입의 슬라이스만을 처리할 수 있게 함
+- 크기가 이미 정해진 스칼라 값은 스택에 저장되므로 `Copy` 트레이트를 구현하고 있으나 제네릭 변수에 `Copy` 트레이트를 구현하지 않는 타입의 값이 전달될 가능성이 생김
+  - `T` 타입에 `Copy` 트레이트 경계를 지정하여 `Copy` 트레이트를 구현하는 타입에 대해서만 호출할 수 있게 함
+- `Copy` 대신 `Clone` 트레이트를 사용하면 함수가 소유권을 가질 때 슬라이스의 각 값을 복제함
+  - `clone` 함수를 사용한다는 것은 `String` 처럼 힙 데이터를 사용하는 타입은 더 많은 힙 메모리를 할당하며, 많은 양의 데이터를 처리할 때 속도가 떨어질 수 있음
+- 슬라이스에 저장된 `T` 타입의 참조를 리턴하는 것
+  - `Clone` 혹은 `Copy` 트레이트 경계를 선언할 필요 없으며 힙 메모리 할당도 필요하지 않음
