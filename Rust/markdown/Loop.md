@@ -65,4 +65,31 @@ fn main() {
 
 [Question_Link - 8393](https://www.acmicpc.net/problem/8393)
 
-### Basic Code
+### Basic Code - for_each
+
+```rust
+use std::io;
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_line(&mut buf)
+        .unwrap();
+    buf.pop();
+    let n = buf.parse::<i32>().unwrap();
+    let mut s = 0;
+    (1..n+1).for_each(
+        |x| {
+            s+=x;
+        }
+    );
+    println!("{s}");
+}
+```
+
+<br>
+
+### Basic Code - formula
+
+```rust
+
+```
