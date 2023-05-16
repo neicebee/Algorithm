@@ -77,7 +77,7 @@ fn main() {
     buf.pop();
     let n = buf.parse::<i32>().unwrap();
     let mut s = 0;
-    (1..n+1).for_each(
+    (1..=n).for_each(
         |x| {
             s+=x;
         }
@@ -89,6 +89,65 @@ fn main() {
 <br>
 
 ### Basic Code - formula
+
+```rust
+use std::io;
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_line(&mut buf)
+        .unwrap();
+    buf.pop();
+    let n = buf.parse::<i32>().unwrap();
+    println!("{}", n*(n+1)/2)
+}
+```
+
+<br>
+
+## Receipt
+
+[Question_Link - 25304](https://www.acmicpc.net/problem/25304)
+
+### Basic Code
+
+```rust
+use std::io;
+
+fn input() -> String {
+    let mut buf = String::new();
+    io::stdin().read_line(&mut buf)
+        .unwrap();
+    buf.pop();
+    buf
+}
+
+fn main() {
+    let x = input().parse::<i32>().unwrap();
+    let n = input().parse::<i32>().unwrap();
+    let mut s = 0;
+    (0..n).for_each(
+        |_| {
+            let mut tmp = 1;
+            input().split(' ').for_each(
+                |y| {
+                    tmp*=y.parse::<i32>().unwrap()
+                }
+            );
+            s+=tmp;
+        }
+    );
+    println!("{}", if x==s { "Yes" } else { "No" });
+}
+```
+
+<br>
+
+## Coding is Physical Education
+
+[Question_Link - 25314](https://www.acmicpc.net/problem/25314)
+
+### Basic Code
 
 ```rust
 
