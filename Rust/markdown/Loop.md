@@ -147,8 +147,107 @@ fn main() {
 
 [Question_Link - 25314](https://www.acmicpc.net/problem/25314)
 
+### Basic Code - 1
+
+```rust
+use std::io;
+
+fn main() {
+    let mut s = String::new();
+    let l = "long ";
+    let mut buf = String::new();
+    io::stdin().read_line(&mut buf).unwrap();
+    buf.pop();
+    let n = {
+        (buf.parse::<i32>().unwrap())/4
+    };
+    (0..n).for_each(
+        |_| s.push_str(l)
+    );
+    println!("{}int", s);
+}
+```
+
+<br>
+
+### Basic Code - 2
+
+```rust
+use std::io;
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_line(&mut buf).unwrap();
+    buf.pop();
+    let n = buf.parse::<i32>().unwrap();
+    for _ in 0..n>>2 {
+        print!("long ");
+    }
+    print!("int");
+}
+```
+
+<br>
+
+## Quick A+B
+
+[Question_Link - 15552](https://www.acmicpc.net/problem/15552)
+
 ### Basic Code
 
 ```rust
+use std::io::{self, Write};
+
+fn main() {
+    let mut out = io::BufWriter::new(io::stdout());
+    for l in io::stdin().lines().skip(1) {
+        let r = l.unwrap().split(' ').map(
+            |x| x.parse::<i32>().unwrap()
+        ).sum::<i32>();
+        writeln!(out, "{}", r).unwrap();
+    }
+}
+```
+
+<br>
+
+### `lines()` & `skip()`
 
 ```
+// data.txt
+5
+1 1
+12 34
+5 500
+40 60
+1000 1000
+```
+
+```rust
+use std::io::Read;
+
+fn main() {
+    let mut file = std::fs::File::open("src/data.txt").unwrap();
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).unwrap();
+    for l in contents.lines().skip(1) {
+        print!("{l}: ");
+        let r = l.split(' ').map(
+            |x| x.parse::<i32>().unwrap()
+        ).sum::<i32>();
+        println!("{r}");
+    }
+}
+// Result
+// 1 1: 2
+// 12 34: 46
+// 5 500: 505
+// 40 60: 100
+// 1000 1000: 2000
+```
+
+<br>
+
+## A+B - 7
+
+[Question_Link - 11021](https://www.acmicpc.net/problem/11021)

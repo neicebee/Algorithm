@@ -1,27 +1,14 @@
-use std::io;
-
-fn input() -> String {
-    let mut buf = String::new();
-    io::stdin().read_line(&mut buf)
-        .unwrap();
-    buf.pop();
-    buf
-}
+use std::io::Read;
 
 fn main() {
-    let x = input().parse::<i32>().unwrap();
-    let n = input().parse::<i32>().unwrap();
-    let mut s = 0;
-    (0..n).for_each(
-        |_| {
-            let mut tmp = 1;
-            input().split(' ').for_each(
-                |y| {
-                    tmp*=y.parse::<i32>().unwrap()
-                }
-            );
-            s+=tmp;
-        }
-    );
-    println!("{}", if x==s { "Yes" } else { "No" });
+    let mut file = std::fs::File::open("src/data.txt").unwrap();
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).unwrap();
+    for l in contents.lines().skip(1) {
+        print!("{l}: ");
+        let r = l.split(' ').map(
+            |x| x.parse::<i32>().unwrap()
+        ).sum::<i32>();
+        println!("{r}");
+    }
 }
