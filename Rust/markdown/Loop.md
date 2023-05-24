@@ -251,3 +251,48 @@ fn main() {
 ## A+B - 7
 
 [Question_Link - 11021](https://www.acmicpc.net/problem/11021)
+
+### Basic Code
+
+```rust
+use std::io::{self, Write};
+
+fn main() {
+    let mut cnt: i32 = 1;
+    let mut out = io::BufWriter::new(io::stdout());
+    for l in io::stdin().lines().skip(1) {
+        let r = l.unwrap().split(' ').map(
+            |x| x.parse::<i32>().unwrap()
+        ).sum::<i32>();
+        writeln!(out, "Case #{cnt}: {r}").unwrap();
+        cnt+=1;
+    }
+}
+```
+
+<br>
+
+## A+B - 8
+
+[Question_Link - 11022](https://www.acmicpc.net/problem/11022)
+
+### Basic Code
+
+```rust
+use std::io::{self, Write};
+
+fn main() {
+    let mut cnt = 1;
+    let mut out = io::BufWriter::new(io::stdout());
+    for l in io::stdin().lines().skip(1) {
+        let r: Vec<i32> = l.unwrap().split(' ').map(
+            |x| x.parse::<i32>().unwrap()
+        ).collect();
+        writeln!(
+            out, "Case #{cnt}: {} + {} = {}",
+            r[0], r[1], r.iter().sum::<i32>()
+        ).unwrap();
+        cnt+=1;
+    }
+}
+```
