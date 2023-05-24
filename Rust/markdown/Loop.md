@@ -296,3 +296,112 @@ fn main() {
     }
 }
 ```
+
+<br>
+
+## Draw Stars - 1
+
+[Question_Link - 2438](https://www.acmicpc.net/problem/2438)
+
+### Basic Code - for & for_each
+
+```rust
+use std::io;
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_line(&mut buf).unwrap();
+    buf.pop();
+    for i in 1..=buf.parse::<i32>().unwrap() {
+        (0..i).for_each(|_| print!("*"));
+        print!("\n");
+    }
+}
+```
+
+<br>
+
+### Basic Code - only for_each
+
+```rust
+use std::io;
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_line(&mut buf).unwrap();
+    buf.pop();
+    (1..=buf.parse::<usize>().unwrap()).for_each(
+        |x| println!("{}", "*".repeat(x))
+    );
+}
+```
+
+<br>
+
+## Draw Stars - 2
+
+[Question_Link - 2439](https://www.acmicpc.net/problem/2439)
+
+### Basic Code
+
+```rust
+use std::io;
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_line(&mut buf).unwrap();
+    buf.pop();
+    let n = buf.parse::<usize>().unwrap();
+    (1..=n).for_each(
+        |x| println!(
+            "{}{}", " ".repeat(n-x), "*".repeat(x)
+        )
+    );
+}
+```
+
+<br>
+
+## A+B - 5
+
+[Question_Link - 10952](https://www.acmicpc.net/problem/10952)
+
+### Basic Code
+
+```rust
+use std::io::{self, Write};
+
+fn main() {
+    let mut out = io::BufWriter::new(io::stdout());
+    for l in io::stdin().lines() {
+        let r = l.unwrap().trim().split(' ').map(
+            |x| x.parse::<i32>().unwrap()
+        ).sum::<i32>();
+        if r != 0 {
+            writeln!(out, "{r}").unwrap();
+        }
+    }
+}
+```
+
+<br>
+
+## A+B - 4
+
+[Question_Link - 10951](https://www.acmicpc.net/problem/10951)
+
+### Basic Code
+
+```rust
+use std::io::{self, Write};
+
+fn main() {
+    let mut out = io::BufWriter::new(io::stdout());
+    for l in io::stdin().lines() {
+        let r = l.unwrap().trim().split(' ').map(
+            |x| x.parse::<i32>().unwrap()
+        ).sum::<i32>();
+        writeln!(out, "{r}").unwrap();
+    }
+}
+```
