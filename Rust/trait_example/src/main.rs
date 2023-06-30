@@ -19,4 +19,5 @@ fn main() {
 
     println!("새 트윗 1개: {}", tweet.summarize());
     println!("새로운 기사: {}", article.summarize());
+    notify(article);
 }

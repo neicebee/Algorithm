@@ -649,3 +649,213 @@ fn main() {
   - `clone` 함수를 사용한다는 것은 `String` 처럼 힙 데이터를 사용하는 타입은 더 많은 힙 메모리를 할당하며, 많은 양의 데이터를 처리할 때 속도가 떨어질 수 있음
 - 슬라이스에 저장된 `T` 타입의 참조를 리턴하는 것
   - `Clone` 혹은 `Copy` 트레이트 경계를 선언할 필요 없으며 힙 메모리 할당도 필요하지 않음
+
+<br>
+
+**(1)** 트레이트 경계를 이용해 조건에 따라 메서드 구현하기
+
+```rust
+use std::fmt::Display;
+
+struct Pair<T> {
+    x: T,
+    y: T,
+}
+
+impl<T> Pair<T> {
+    fn new(x: T, y: T) -> Self {
+        Self {
+            x,
+            y,
+        }
+    }
+}
+
+impl<T: Display + PartialOrd> Pair<T> {
+    fn cmp_display(&self) {
+        if self.x >= self.y {
+            println!("가장 큰 멤버는 x = {}", self.x);
+        } else {
+            println!("가장 큰 멤버는 y = {}", self.y);
+        }
+    }
+}
+
+fn main() {
+    let p = Pair::new(2, 4);
+    p.cmp_display();
+}
+// Result
+// 가장 큰 멤버는 y = 4
+```
+- 제네릭 타입 매개변수를 사용하는 `impl` 블록에 트레이트 경계 사용 시 타입이 특정 트레이트를 구현하는지에 따라 메서드를 구현할 수 있음
+
+```rust
+impl<Display> ToString for T {
+    // -- 생략 --
+}
+
+fn main() {
+    let s = 3.to_string();
+}
+```
+- `덮개 구현(blanket implementations)` : 타입에 트레이트 경계를 만족하는 트레이트를 구현하는 것
+  - 러스트의 표준 라이브러리에서 매우 빈번하게 사용
+  - 표준 라이브러리는 `Display` 트레이트를 구현하는 타입에는 `ToString` 트레이트도 함께 구현함
+    - 표준 라이브러리의 덮개 구현 기법으로 인해 `Display` 를 구현하는 모든 타입에 대해 `ToString` 트레이트가 정의한 `to_string` 메서드 호출 가능
+
+<br>
+
+### **4️⃣ 수명을 이용해 참조 유효성 검사하기**
+- `수명(lifetimes)` : 참조가 유효한 범위
+  - 암묵적이며, 타입이 대부분 `추론(inferred)` 에 의해 결정되는 것처럼 수명 역시 추론을 토대로 동작
+  - 수명이 달라질 수 있을 때 수명 애노테이션 추가
+
+#### **🤔 수명을 이용해 죽은 참조의 발생 방지하기**
+
+```rust
+fn main() {
+    let r;
+    {
+        let x = 5;
+        r = &x;
+    }
+    println!("r: {}", r);
+}
+// Result
+// error[E0597]: `x` does not live long enough
+```
+- 수명의 주요 목적은 **_죽은 참조가 발생하는 것을 방지하는 것_**
+  - 죽은 참조: 프로그램이 원래 의도했던 데이터와는 다른 데이터를 참조하게 될 때를 뜻함
+- 변수 x는 안쪽의 범위를 벗어나는 순간 더는 유효하지 않기에 수명이 충분치 않다는 오류 발생
+- 러스트 컴파일러는 `대여 검사기` 를 탑재하여 코드가 더 이상 유효하지 않은지 알 수 있음
+
+<br>
+
+#### **🤔 대여 검사기**
+- `대여 검사기(borrow checker)` : 대여한 값이 현재 범위 내에서 유효한지 검사
+
+```rust
+fn main() {
+    let x = 5;
+    let r = &x;
+    println!("r: {r}");
+}
+```
+- 변수 x를 변수 r보다 수명을 늘려 죽은 참조 문제를 해결한 코드
+  - 변수 x가 유효한 동안 변수 r이 참조하는 메모리가 항상 유효함
+
+<br>
+
+#### **🤔 함수의 제네릭 수명**
+
+```rust
+fn longest(x: &str, y: &str) -> &str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+
+fn main() {
+    let msg1 = String::from("abcd");
+    let msg2 = "xyz";
+    println!("longest: {}", longest(msg1.as_str(), msg2));
+}
+// Result
+// error[E0106]: missing lifetime specifier
+```
+- 러스트 입장에서 리턴값이 변수 x와 y 중 어떤 것이 리턴될 지 알 수 없으므로 리턴 타입에 제네릭 수명 매개변수를 지정해야 함
+- 함수에 전달되는 참조의 실제 수명도 알 수 없으므로 범위를 이용해 리턴하려는 참조가 항상 유효한지를 확인할 수 없음
+
+<br>
+
+#### **🤔 수명 애노테이션 문법**
+- 수명 애노테이션은 참조의 유효 기간을 변경하지는 않으며 개별 참조의 수명에 영향을 주지 않으면서 여러 참조 간 수명의 관계를 서술할 수 있음
+- 제네릭 수명 매개변수를 지정하면 어떤 수명의 참조도 전달할 수 있음
+
+```rust
+&i32            // 참조
+&'a i32         // 명시적인 수명을 가진 참조
+&'a mut i32     // 명시적인 수명을 가진 가변 참조
+```
+- 수명 애노테이션 문법
+- 수명 애노테이션은 그 자체로 많은 의미를 갖지 않음
+  - 러스트에게 제네릭 수명 매개변수가 지정된 각 참조가 서로 어떤 관계인지 명시할 뿐
+
+<br>
+
+#### **🤔 함수 시그니처의 수명 애노테이션**
+
+```rust
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+
+fn main() {
+    let msg1 = String::from("abcd");
+    let msg2 = "xyz";
+    println!("longest: {}", longest(msg1.as_str(), msg2));
+}
+// Result
+// longest: abcd
+```
+- 제네릭 타입 매개변수와 마찬가지로 함수 이름과 매개변수 사이의 꺾쇠괄호에 제네릭 수명 매개변수를 선언해야 함
+- 모든 참조 매개변수와 리턴값이 같은 수명을 가져야 하기 때문에 수명 `'a` 를 모든 참조에 지정함
+- 수명 매개변수를 함수 시그니처에 명시한다고 해서 함수에 전달되거나 함수가 리턴하는 값의 수명을 변경하는 것이 아님
+  - 대여 검사기가 이 제약에 일치하지 않는 값을 사용하지 못하도록 할 뿐
+
+```rust
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+
+fn main() {
+    let msg1 = String::from("abcd");
+    {
+        let msg2 = String::from("xyz");
+        let result = longest(msg1.as_str(), msg2.as_str());
+        println!("longest: {result}");
+    }
+}
+// Result
+// longest: abcd
+```
+- 리턴값에 대한 참조인 변수 result가 안쪽 범위에서 유효하기에 코드는 컴파일됨
+
+```rust
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+
+fn main() {
+    let msg1 = String::from("abcd");
+    let result;
+    {
+        let msg2 = String::from("xyz");
+        result = longest(msg1.as_str(), msg2.as_str());
+    }
+    println!("longest: {result}");
+}
+// Result
+// error[E0597]: `msg2` does not live long enough
+```
+- 변수 result가 유효하려면 변수 msg2가 바깥쪽 범위가 끝날 때까지 유효해야 함
+- 변수 msg2가 유효하지 않기에 유효하지 않은 참조를 리턴할 가능성이 있어서 컴파일되지 않음
+
+<br>
+
+#### **🤔 수명의 관점에서 생각하기**

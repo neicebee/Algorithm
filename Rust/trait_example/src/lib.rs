@@ -33,3 +33,7 @@ impl Summary for Tweet {
         )
     }
 }
+
+pub fn notify<T: Summary>(item: T) {
+    println!("속보! {}", item.summarize());
+}
