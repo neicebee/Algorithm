@@ -859,3 +859,171 @@ fn main() {
 <br>
 
 #### **🤔 수명의 관점에서 생각하기**
+- 수명 매개변수를 지정해야 하는 상황은 함수의 동작에 따라 다름
+- 함수가 참조를 리턴할 때는 리턴 타입의 수명 매개변수는 매개변수 중 하나의 수명 매개변수와 일치해야 함
+- 수명 문법은 함수의 여러 매개변수와 리턴값의 수명을 연결함
+  - 수명이 연결되면 러스트는 메모리에 안정적인 작업을 허용하고, 죽은 포인터나 기타 메모리 안전성을 위반하는 작업을 차단하는 데 필요한 충분한 정보를 얻음
+
+<br>
+
+#### **🤔 구조체 정의에서의 수명 애노테이션**
+
+```rust
+struct ImportantExcerpt<'a> {
+    part: &'a str,
+}
+
+fn main() {
+    let novel = String::from("죄와 벌. 가난한 대학생 출신인 라스콜니코프는...");
+    let first_sentence = novel.split('.')
+        .next().expect(
+            "문장에서 '.'를 찾을 수 없음."
+        );
+    let i = ImportantExcerpt { part: first_sentence };
+    
+    println!("first_sentence: {first_sentence}");
+    println!("i: {}", i.part);
+}
+// Result
+// first_sentence: 죄와 벌
+// i: 죄와 벌
+```
+- `ImportantExcerpt` 구조체의 인스턴스가 `part` 필드에 저장된 참조의 수명을 벗어날 수 없음
+
+<br>
+
+#### **🤔 수명의 생략**
+
+```rust
+fn first_word(s: &str) -> &str {
+    let bytes = s.as_bytes();
+
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[0..i];
+        }
+    }
+    &s[..]
+}
+
+fn main() {
+    let msg = String::from("Hello, Rust!");
+
+    println!("{}", first_word(msg.as_str()));
+}
+// Result
+// Hello,
+```
+- 러스트의 초기 버전에서는 모든 참조가 명시적으로 수명이 있어야 했음
+  - 특정 상황에서 같은 수명 애노테이션을 반복해서 적용해야 함
+  - 때문에 몇 가지 결정적인 패턴을 컴파일러의 코드에 추가해서 대여 검사기가 해당 상황에서는 수명을 추론함으로써 명시적인 애노테이션이 필요치 않도록 했음
+- `수명 생략 규칙(lifetime elision rules)` : 러스트의 참조 분석에 추가된 패턴
+  - 프로그래머가 준수해야 할 규칙이 아닌 컴파일러가 고려해야 할 특정한 상황을 의미
+  - 완벽한 추론을 제공하지는 않음
+  - `입력 수명(input lifetime)` : 함수나 메서드의 매개변수에 적용되는 수명
+  - `출력 수명(output lifetime)` : 리턴값에 적용되는 수명
+  - 컴파일러가 세 개의 규칙을 모두 적용했는데도 참조의 적절한 수명을 판단할 수 없으면 에러 발생
+    - `fn` 키워드로 정의한 함수, `impl` 블록에도 적용됨
+  - **규칙 (1)** 각 참조 매개변수는 각각의 수명 매개변수가 있어야 함
+  - **규칙 (2)** 명시적으로 하나의 입력 수명 매개변수가 있으면 입력 수명을 모든 출력 수명 매개변수에 적용함
+  - **규칙 (3)** 입력 수명 매개변수가 하나 이상이며 함수가 메서드로 선언되어서 매개변수 중 하나가 `&self` 나 `&mut self` 일 때는 `self` 변수의 수명을 모든 출력 수명 매개변수에 적용함
+    - 메서드의 선언에 더 적은 심볼을 사용할 수 있어 메서드를 읽고 쓰기가 훨씬 쉬움
+
+<br>
+
+#### **🤔 메서드 정의에서의 수명 애노테이션**
+
+```rust
+struct ImportantExcerpt<'a> {
+    part: &'a str,
+}
+
+impl<'a> ImportantExcerpt<'a> {
+    fn level(&self) -> i32 {
+        3
+    }
+
+    fn announce_and_return_part(&self, announcement: &str) -> &str {
+        println!("Attention! {}", announcement);
+        self.part
+    }
+}
+
+fn main() {
+    let novel = String::from("죄와 벌. 가난한 대학생 출신인 라스콜니코프는...");
+    let first_sentence = novel.split('.')
+        .next().expect(
+            "문장에서 '.'를 찾을 수 없음."
+        );
+    let i = ImportantExcerpt { part: first_sentence };
+    
+    println!("{}", i.level());
+    println!("{}", i.announce_and_return_part("Everyone!!"));
+}
+// Result
+// 3
+// Attention! Everyone!!
+// 죄와 벌
+```
+- `self` 를 참조하는 하나의 매개변수를 포함하며 리턴값으로는 아무것도 참조하지 않는 `i32` 타입을 리턴하는 `level` 메서드
+  - 첫 번째 생략 규칙 덕분에 `self` 매개변수에 수명 지정 필요 없음
+- 두 개의 매개변수를 갖는 `announce_and_return_part` 메서드
+  - 두 개의 입력 수명이 명시되었으므로 첫 번째 수명 생략 규칙을 적용해 `&self` 와 `announcement` 매개변수에 각각의 수명 부여
+  - 매개변수 중 하나가 `&self` 이므로 리턴 타입 역시 `&self` 의 수명을 이어받아 모든 참조가 수명을 갖게 됨
+
+<br>
+
+#### **🤔 정적 수명**
+
+```rust
+let s: &'static str = "String has a static lifetime.";
+```
+- `정적 수명('static)` : 특별한 수명으로 전체 프로그램에 적용됨
+  - 프로그램 바이너리에 직접 저장되며 항상 사용할 수 있음
+  - 참조에 `'static` 수명을 적용하기에 앞서 이 참조가 실제로 프로그램의 전체 수명과 같아야 하는지 생각해 볼 필요가 있음
+    - 발생하는 문제 대부분은 죽은 참조나 수명 불일치로 인해 발생하기 때문
+    - 이런 문제의 적절한 해결책은 `'static` 수명 적용이 아닌 문제의 근본 원인을 해결하는 것임
+
+<br>
+
+### **5️⃣ 제네릭 타입 매개변수, 트레이트 경계, 그리고 수명**
+
+```rust
+use std::fmt::Display;
+
+fn longest_with_an_announcement<'a, T>(x: &'a str, y: &'a str, ann: T) -> &'a str 
+    where T: Display
+{
+    println!("Attention! {}", ann);
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+
+fn main() {
+    let msg1 = String::from("abcd");
+    let msg2 = String::from("xyz");
+
+    let result = longest_with_an_announcement(
+        msg1.as_str(), msg2.as_str(), "Everyone!!"
+    );
+
+    println!("result: {}", result);
+}
+```
+- 제네릭 타입 매개변수, 트레이트 경계, 수명을 하나의 함수에 모두 적용한 예제 코드
+- 해당 함수는 문자열 슬라이스의 길이를 비교하기 전에 제네릭 매개변수의 값을 출력하므로 `Display` 트레이트 경계가 필요함
+
+<br>
+
+## **Summary**
+- 제네릭 타입 매개변수
+  - 다른 타입을 대상으로 같은 코드를 실행할 수 있게 함
+- 트레이트와 트레이트 경계
+  - 코드에 필요한 행위를 정의할 수 있는 방법
+  - 제네릭 타입에도 가능함
+- 수명 애노테이션
+  - 죽은 참조에 대한 걱정 없이 유연하게 동작하는 코드 작성 가능
+  - 이에 대한 분석은 모두 컴파일 타임에 이루어지므로 런타임 성능에 아무런 영향을 미치지 않음
