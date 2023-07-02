@@ -149,7 +149,7 @@ fn main() {
         });
 
     // let (min, max) = n.fold(
-    //     (MAX, -MAX), |(min, max), num| (num.min(num), num.max(num))
+    //     (MAX, -MAX), |(min, max), num| (num.min(min), num.max(max))
     // );
     // 위와 같은 코드인데 min과 max 메서드를 사용하여 간결하게 짤 수 있음
 
@@ -168,3 +168,23 @@ fn main() {
 [Question_Link - 2562](https://www.acmicpc.net/problem/2562)
 
 ### Basic Code
+
+```rust
+use std::io::{self, Read};
+
+fn main() {
+    const MAX: i32 = 100;
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+
+    let n = buf.split('\n').flat_map( str::parse::<i32> );
+
+    let (c, max) = n.enumerate().fold(
+        (0, -MAX), |(c, max), (i , v)| {
+            if max > v { (c, max) }
+            else { (i+1, v.max(max)) }
+        });
+    
+    println!("{max}\n{c}");
+}
+```
