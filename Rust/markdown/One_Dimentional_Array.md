@@ -188,3 +188,41 @@ fn main() {
     println!("{max}\n{c}");
 }
 ```
+
+<br>
+
+### Improvement Code - max_by & cmp
+
+```rust
+use std::io::{self, Read};
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+
+    let n = buf.split_ascii_whitespace().flat_map( str::parse::<i32> );
+    let max = n.enumerate().max_by(
+        |x, y| (x.1.cmp(&y.1))
+    ).unwrap();
+
+    println!("{}\n{}", max.1, max.0+1);
+}
+```
+
+<br>
+
+[trait_Iterator_method_max_by in Official Document](https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.max_by)
+
+[trait_Ord_method_cmp in Official Document](https://doc.rust-lang.org/std/cmp/trait.Ord.html#tymethod.cmp)
+
+<br>
+
+## Put the Ball
+
+[Question_Link - 10810](https://www.acmicpc.net/problem/10810)
+
+### Basic Code
+
+```rust
+
+```
