@@ -224,5 +224,73 @@ fn main() {
 ### Basic Code
 
 ```rust
+use std::io::{self, Read};
 
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+
+    let n;
+
+    {
+        let v: Vec<i32> = buf.lines().next().unwrap().split(' ').map(
+            |x| x.parse().unwrap()
+        ).collect();
+        n = v[0];
+    }
+
+    let mut basket = vec![0; n as usize];
+
+    for l in buf.lines().skip(1) {
+        let mut tmp = l.split(' ').flat_map( str::parse::<i32> );
+        let (i, j, k) = (
+            tmp.next().unwrap()-1,
+            tmp.next().unwrap()-1,
+            tmp.next().unwrap()
+        );
+        (i..=j).for_each(|x| {
+            basket[x as usize] = k;
+        });
+    }
+    
+    basket.iter().for_each(|x| print!("{x} "));
+}
+```
+
+<br>
+
+## Change the Ball
+
+[Question_Link - 10810](https://www.acmicpc.net/problem/10810)
+
+### Basic Code
+
+```rust
+use std::io::{self, Read};
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    let n;
+    let mut b: Vec<i32> = Vec::new();
+
+    {
+        let v: Vec<i32> = buf.lines().next().unwrap().split(' ')
+            .map(|x| x.parse().unwrap()).collect();
+        n = v[0];
+    }
+
+    (0..n).for_each(|x| b.push(x+1));
+
+    for l in buf.lines().skip(1) {
+        let mut t = l.split(' ').flat_map(str::parse::<i32>);
+        let (i, j) = (t.next().unwrap()-1, t.next().unwrap()-1);
+        b.swap(i as usize, j as usize);
+        // let tmp = b[i as usize];
+        // b[i as usize] = b[j as usize];
+        // b[j as usize] = tmp;
+        // 해당 코드와 같은 동작을 하는 벡터의 swap 메서드
+    }
+    b.iter().for_each(|x| print!("{x} "));
+}
 ```
