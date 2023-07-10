@@ -294,3 +294,65 @@ fn main() {
     b.iter().for_each(|x| print!("{x} "));
 }
 ```
+
+<br>
+
+## Who hasn't submitted an assignment?
+
+[Question_Link - 5597](https://www.acmicpc.net/problem/5597)
+
+### Basic Code
+
+```rust
+use std::io::{self, Read};
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    let mut iter = buf.split('\n').flat_map(str::parse::<u8>);
+    let sub = [0; 28].map(|_| iter.next().unwrap());
+    (1..=30).for_each(|x| if !sub.contains(&x) { println!("{x}") });
+}
+```
+
+<br>
+
+### Improvement Code
+
+```rust
+use std::io::{stdin, BufReader, BufRead};
+
+fn main() {
+    let s: Vec<u8> = BufReader::new(stdin()).lines()
+        .map(|x| x.unwrap().parse::<u8>().unwrap()).collect();
+    (1..=30).for_each(|i| if !s.contains(&i) { println!("{i}") });
+}
+```
+
+<br>
+
+[struct_BufReader in Official Document](https://doc.rust-lang.org/std/io/struct.BufReader.html)
+
+[trait_BufRead in Official Document](https://doc.rust-lang.org/std/io/trait.BufRead.html)
+
+<br>
+
+## Modulo
+
+[Question_Link - 3052](https://www.acmicpc.net/problem/3052)
+
+### Basic Code
+
+```rust
+use std::io::{stdin, BufReader, BufRead};
+
+fn main() {
+    let mut buf: Vec<u32> = BufReader::new(stdin()).lines()
+        .map(|x| x.unwrap().parse::<u32>().unwrap()%42).collect();
+    buf.sort();
+    buf.dedup();
+    println!("{}", buf.len());
+}
+```
+
+<br>
