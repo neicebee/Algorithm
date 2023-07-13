@@ -361,8 +361,84 @@ fn main() {
 
 [Question_Link - 10811](https://www.acmicpc.net/problem/10811)
 
+### Basic Code - swap
+
+```rust
+use std::io::{self, Read};
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    let n: u32;
+    {
+        let mut it = buf.lines().next().unwrap().split(' ')
+            .map(|x| x.parse().unwrap());
+        n = it.next().unwrap();
+    }
+    let mut b: Vec<_> = Vec::new();
+    (1..=n).for_each(|x| b.push(x));
+    
+    for l in buf.lines().skip(1) {
+        let mut it = l.split(' ').flat_map(str::parse::<u32>);
+        let (i, j) = (it.next().unwrap()-1, it.next().unwrap()-1);
+        (0..=(j-i)/2).for_each(
+            |t| b.swap((t+i) as usize, (j-t) as usize)
+        );
+    }
+    b.iter().for_each(|i| print!("{i} "));
+}
+```
+
+<br>
+
+### Basic Code - reverse
+
+```rust
+use std::io::{self, Read};
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    let n: usize;
+    {
+        let mut it = buf.lines().next().unwrap().split(' ')
+            .map(|x| x.parse().unwrap());
+        n = it.next().unwrap();
+    }
+    let mut b: Vec<_> = Vec::new();
+    (1..=n).for_each(|x| b.push(x));
+    
+    for l in buf.lines().skip(1) {
+        let mut it = l.split(' ').flat_map(str::parse::<usize>);
+        let (i, j) = (it.next().unwrap()-1, it.next().unwrap()-1);
+        b[i..=j].reverse();
+    }
+    b.iter().for_each(|i| print!("{i} "));
+}
+```
+
+<br>
+
+## Average
+
+[Question_Link - 1546](https://www.acmicpc.net/problem/1546)
+
 ### Basic Code
 
 ```rust
+use std::io::{self, Read};
 
+fn main() {
+    const MAX: f64 = 100.0;
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+
+    let s: Vec<f64> = buf.lines().skip(1).next().unwrap()
+        .split(' ').map(|x| x.parse().unwrap()).collect();
+    let max = s.iter().fold(
+        -MAX, |max, n| n.max(max));
+    let mut r: Vec<f64> = Vec::new();
+    s.iter().for_each(|x| r.push(x/max*100.0));
+    println!("{}", r.iter().sum::<f64>()/r.len() as f64);
+}
 ```
