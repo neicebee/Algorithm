@@ -46,5 +46,43 @@ fn main() {
 ### Basic Code
 
 ```rust
+use std::io::{self, Read};
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    for l in buf.lines().skip(1) {
+        println!("{}{}", &l[..1], &l[l.len()-1..]);
+    }
+}
+```
+
+<br>
+
+## ASCII Code
+
+[Question_Link - 11654](https://www.acmicpc.net/problem/11654)
+
+### Basic Code
+
+```rust
+use std::io::{self, Read};
+
+fn main() {
+    let mut b = [0; 1];
+    io::stdin().read(&mut b).unwrap();
+    println!("{}", &b[0]);
+}
+```
+
+<br>
+
+## Sum of Numbers
+
+[Question_Link - 11720](https://www.acmicpc.net/problem/11720)
+
+### Basic Code
+
+```rust
 
 ```
