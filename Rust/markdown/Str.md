@@ -84,5 +84,49 @@ fn main() {
 ### Basic Code
 
 ```rust
+use std::io::{self, Read};
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    let mut v: Vec<i32> = Vec::new();
+    let mut iter = buf.lines();
+    let (n, m) = (iter.next().unwrap().parse::<usize>().unwrap(),
+        iter.next().unwrap());
+    (1..=n).for_each(|x| {
+        let tmp = &m[x-1..x];
+        v.push(tmp.parse::<i32>().clone().unwrap());
+    });
+    println!("{}", v.iter().sum::<i32>());
+}
+```
+
+<br>
+
+### Improvement Code - chars & to_digit
+
+```rust
+use std::io::{self, Read};
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    for l in buf.lines().skip(1) {
+        let s = l.chars().map(|x| x.to_digit(10).unwrap())
+            .sum::<u32>();
+        println!("{s}");
+    }
+}
+```
+
+<br>
+
+## Find the Alphabet
+
+[Question_Link - 10809](https://www.acmicpc.net/problem/10809)
+
+### Basic Code
+
+```rust
 
 ```
