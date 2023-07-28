@@ -128,5 +128,50 @@ fn main() {
 ### Basic Code
 
 ```rust
+use std::io::{self, *};
 
+fn main() {
+    let mut l = [-1_i32; 26];
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    for (i, v) in buf.trim().bytes().enumerate() {
+        if l[(v-97) as usize] == -1 {
+            l[(v-97) as usize] = i as i32;
+        }
+    }
+    l.iter().for_each(|x| print!("{x} "));
+}
 ```
+
+<br>
+
+## Repeat String
+
+[Question_Link - 2675](https://www.acmicpc.net/problem/2675)
+
+### Basic Code
+
+```rust
+use std::io::{self, *};
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    for l in buf.lines().skip(1) {
+        let mut sp = l.split(' ');
+        let (r, s) = (
+            sp.next().unwrap().parse::<u8>().unwrap(),
+            sp.next().unwrap().chars());
+        s.for_each(|x| (0..r).for_each(|_| print!("{x}")));
+        println!("");
+    }
+}
+```
+
+<br>
+
+## 
+
+[Question_Link - 2675](https://www.acmicpc.net/problem/2675)
+
+### Basic Code
