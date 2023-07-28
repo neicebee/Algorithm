@@ -170,8 +170,66 @@ fn main() {
 
 <br>
 
-## 
+## Number of words
 
-[Question_Link - 2675](https://www.acmicpc.net/problem/2675)
+[Question_Link - 1152](https://www.acmicpc.net/problem/1152)
+
+### Basic Code - split()
+
+```rust
+use std::io::{self, *};
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    match buf.trim().len() {
+        0 => println!("0"),
+        _ => println!("{}", buf.trim().split(' ').count()),
+    }
+}
+```
+
+### Basic Code - split_whitespace()
+
+```rust
+use std::io::{self, *};
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    println!("{}", buf.split_whitespace().count());
+}
+```
+
+<br>
+
+## 상수
+
+[Question_Link - 2908](https://www.acmicpc.net/problem/2908)
 
 ### Basic Code
+
+```rust
+use std::io;
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_line(&mut buf).unwrap();
+    let m: i32 = buf.split_whitespace()
+        .map(|x| x.chars().rev().collect::<String>())
+        .map(|x| x.parse().unwrap()).max().unwrap();
+    println!("{m}");
+}
+```
+
+<br>
+
+## Dial
+
+[Question_Link - 5622](https://www.acmicpc.net/problem/5622)
+
+### Basic Code
+
+```rust
+
+```
