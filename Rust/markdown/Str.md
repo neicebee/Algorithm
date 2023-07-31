@@ -231,5 +231,74 @@ fn main() {
 ### Basic Code
 
 ```rust
+use std::{io, collections::HashMap};
 
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_line(&mut buf).unwrap();
+    let mut h: HashMap<u8, Vec<u8>> = HashMap::new();
+    let mut t = 65;
+    let mut r = 0;
+    (3..=10).for_each(|x| {
+        let mut t2: Vec<u8> = Vec::new();
+        if x!=8 && x!=10 {
+            (0..3).for_each(|_| {t2.push(t); t+=1;});
+            h.insert(x, t2);
+        } else {
+            (0..4).for_each(|_| {t2.push(t); t+=1;});
+            h.insert(x, t2);
+        }
+    });
+    for i in buf.trim().bytes() {
+        for (k, v) in h.iter() {
+            if v.contains(&i) {
+                r+=k;
+            }
+        }
+    }
+    println!("{r}");
+}
+```
+
+<br>
+
+### Improvement Code
+
+```rust
+use std::io;
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_line(&mut buf).unwrap();
+    let r = buf.trim().bytes().map(
+        |x| {
+            match x-65 {
+                0..=17 => (x-65)/3+3,
+                18 => 8,
+                19..=21 => 9,
+                22..=25 => 10,
+                _ => 0,
+            }
+        }
+    ).sum::<u8>();
+    println!("{r}");
+}
+```
+
+<br>
+
+## Output as is
+
+[Question_Link - 11718](https://www.acmicpc.net/problem/11718)
+
+### Basic Code
+
+```rust
+use std::io::{self, Read};
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    println!("{buf}");
+}
 ```
