@@ -161,7 +161,39 @@ fn main() {
 
 <br>
 
-### Improvement Code
+## Croatia Alphabet
+
+[Question_Link - 1157](https://www.acmicpc.net/problem/1157)
+
+### Basic Code
+
+```rust
+use std::io;
+
+fn main() {
+    const C: [&str; 8] = [
+        "c=", "c-", "dz=", "d-",
+        "lj", "nj", "s=", "z="
+    ];
+    let mut buf = String::new();
+    io::stdin().read_line(&mut buf).unwrap();
+    let mut m = String::from(buf.trim());
+    for i in C {
+        if m.contains(i) {
+            m = m.replace(i, "^");
+        }
+    }
+    println!("{}", m.len());
+}
+```
+
+<br>
+
+## Group Word Checker
+
+[Question_Link - 1316](https://www.acmicpc.net/problem/1316)
+
+### Basic Code
 
 ```rust
 
