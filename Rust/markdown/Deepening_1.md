@@ -196,5 +196,83 @@ fn main() {
 ### Basic Code
 
 ```rust
+use std::io::{self, *};
 
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    let mut cnt = 0;
+    for w in buf.lines().skip(1) {
+        let mut c = [0; 26];
+        let t = w.trim().bytes();
+        c[(t.clone().nth(0).unwrap()-97) as usize] = 1;
+        for i in 1..w.trim().len() {
+            if t.clone().nth(i).unwrap() == t.clone().nth(i-1).unwrap() {
+                continue;
+            } else if t.clone().nth(i).unwrap() != t.clone().nth(i-1).unwrap() &&
+            c[(t.clone().nth(i).unwrap()-97) as usize] == 1 {
+                cnt+=1;
+                break;
+            } else {
+                c[(t.clone().nth(i).unwrap()-97) as usize] = 1;
+            }
+        }
+    }
+    println!("{}", buf.lines().skip(1).count()-cnt);
+}
+```
+
+<br>
+
+## Your Rating is
+
+[Question_Link - 25206](https://www.acmicpc.net/problem/25206)
+
+### Basic Code
+
+```rust
+use std::io::{self, *};
+
+fn make_array(m: &str) -> (Vec<f64>, Vec<f64>) {
+    let mut g: Vec<f64> = Vec::new();
+    let mut r: Vec<f64> = Vec::new();
+    for l in m.lines() {
+        let mut t = l.split(' ');
+        if t.clone().nth(2).unwrap() == "P" {
+            continue;
+        } else {
+            g.push(t.nth(1).unwrap().parse::<f64>().unwrap());
+            r.push(
+                match t.nth(0).unwrap() {
+                    "A+" => 4.5,
+                    "A0" => 4.0,
+                    "B+" => 3.5,
+                    "B0" => 3.0,
+                    "C+" => 2.5,
+                    "C0" => 2.0,
+                    "D+" => 1.5,
+                    "D0" => 1.0,
+                    "F" => 0.0,
+                    _ => -1.0,
+                }
+            );
+        }
+    }
+    (g, r)
+}
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    let mut a = 0.0;
+    let (g, r) = make_array(buf.trim());
+    if g.is_empty() {
+        println!("{:.6}", a);
+    } else {
+        for i in 0..g.len() {
+            a+=g[i]*r[i];
+        }
+        println!("{:.6}", a/g.iter().sum::<f64>());
+    }
+}
 ```

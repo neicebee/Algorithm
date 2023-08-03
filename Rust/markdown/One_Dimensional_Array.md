@@ -1,4 +1,4 @@
-# 💻 Baekjoon One Dimentional Array Stage
+# 💻 Baekjoon One Dimensional Array Stage
 
 ## Count Number
 
