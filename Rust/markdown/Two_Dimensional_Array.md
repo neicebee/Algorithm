@@ -80,3 +80,40 @@ fn main() {
 [Question_Link - 2738](https://www.acmicpc.net/problem/2738)
 
 ### Basic Code
+
+```rust
+use std::io::{self, *};
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    let mut v: Vec<Vec<i32>> = Vec::new();
+    for l in buf.lines() {
+        v.push(
+            l.split_whitespace()
+            .map(|x| x.parse().unwrap())
+            .collect()
+        );
+    }
+    let mut max = -1;
+    let (mut a, mut b) = (0, 0);
+    for i in 0..9 {
+        for j in 0..9 {
+            if v[i][j] > max {
+                max = v[i][j];
+                (a, b) = (i+1, j+1);
+            }
+        }
+    }
+    println!("{max}");
+    println!("{a} {b}");
+}
+```
+
+<br>
+
+## Vertical Reading
+
+[Question_Link - 10798](https://www.acmicpc.net/problem/10798)
+
+### Basic Code
