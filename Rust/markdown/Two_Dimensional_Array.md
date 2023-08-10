@@ -117,3 +117,66 @@ fn main() {
 [Question_Link - 10798](https://www.acmicpc.net/problem/10798)
 
 ### Basic Code
+
+```rust
+use std::io::{self, *};
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    let mut v: Vec<Vec<char>> = Vec::new();
+    let mut m = 0;
+    for l in buf.lines() {
+        v.push({
+            if l.chars().count() > m { m = l.chars().count(); }
+            l.chars().collect::<Vec<char>>()
+        });
+    }
+    for i in 0..m {
+        for j in 0..5 {
+            print!(
+                "{}",
+                match v[j].get(i) {
+                    None => continue,
+                    _ => v[j][i],
+                }
+            );
+        }
+    }
+}
+```
+
+<br>
+
+## Colored Paper
+
+[Question_Link - 2563](https://www.acmicpc.net/problem/2563)
+
+### Basic Code
+
+```rust
+use std::io::{self, *};
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    let mut p = [[0; 100]; 100];
+    let mut r = 0;
+    for l in buf.lines().skip(1) {
+        let (x, y) = {
+            let mut t = l.split(' ');
+            (t.next().unwrap().parse::<usize>().unwrap(),
+            t.next().unwrap().parse::<usize>().unwrap())
+        };
+        for i in x..x+10 {
+            for j in y..y+10 {
+                if p[i][j]==0 {
+                    p[i][j]=1;
+                    r+=1;
+                }
+            }
+        }
+    }
+    println!("{r}");
+}
+```
