@@ -98,5 +98,53 @@ fn main() {
 ### Basic Code
 
 ```rust
+use std::io::{self, *};
+
+fn main() {
+    const C: [u32; 4] = [25, 10, 5, 1];
+    let mut buf = String::new();
+    io::stdin().read_to_string(&mut buf).unwrap();
+    for l in buf.lines().skip(1) {
+        let mut c = l.trim().parse::<u32>().unwrap();
+        for i in C {
+            print!("{} ", c/i);
+            c%=i;
+        }
+        println!("");
+    }
+}
+```
+
+<br>
+
+## 중앙 이동 알고리즘
+
+[Question_Link - 2903](https://www.acmicpc.net/problem/2903)
+
+### Basic Code
+
+```rust
+use std::io;
+
+fn main() {
+    let mut buf = String::new();
+    io::stdin().read_line(&mut buf).unwrap();
+    let n = buf.trim().parse::<u32>().unwrap();
+    println!("{}", (1+2_u32.pow(n)).pow(2));
+}
+```
+- 공식 : $(1+2^n)^2$
+
+<br>
+
+## 벌집
+
+[Question_Link - 2292](https://www.acmicpc.net/problem/2292)
+
+### Basic Code
+
+```rust
 
 ```
+
+-https://blog.naver.com/kwonhj214/223072847019
