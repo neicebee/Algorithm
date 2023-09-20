@@ -5,6 +5,7 @@ C'...' 형태 : ASCII 코드로 이루어진 16진수
 */
 
 use std::{fs, io::Read, error::Error, process};
+use regex::Regex;
 
 fn read_file() -> Result<String, Box<dyn Error>> {
     let mut f = fs::File::open("numb.s")?;
@@ -14,24 +15,28 @@ fn read_file() -> Result<String, Box<dyn Error>> {
     Ok(contents)
 }
 
-fn split_contents(contents: String) -> (Vec<String>, Vec<String>, Vec<u64>) {
+fn split_contents(contents: &str) -> (Vec<u64>, Vec<u64>, Vec<u64>) {
     let mut hex = vec![];
     let mut ascii_hex = vec![];
     let mut dec = vec![];
-    for i in contents.split_ascii_whitespace() {
-        if i.contains('X') {
-            let t = i.replace('\'', "").replace('X', "");
-            println!("{}", u64::from_str_radix(&t[..], 16).unwrap());
-            hex.push(t);
-        } else if i.contains('C') {
-            let mut h = String::new();
-            let t = i.replace('\'', "").replace('C', "");
-            for b in t.bytes() {
-                h.push_str(&format!("{b:x}"));
+    let re1 = Regex::new(r"X'([A-Z0-9]+?)'").unwrap();
+    let re2 = Regex::new(r"C'([A-Z0-9]+?)'").unwrap();
+    for token in contents.split_whitespace() {
+        if re1.is_match(token) {
+            let tmp = re1.captures(token).unwrap().get(1).unwrap().as_str();
+            hex.push(u64::from_str_radix(tmp, 16).unwrap());
+            println!("token: {token}\t\t\tdec: {}", u64::from_str_radix(tmp, 16).unwrap());
+        } else if re2.is_match(token) {
+            let mut t = String::new();
+            let tmp = re2.captures(token).unwrap().get(1).unwrap().as_str();
+            for b in tmp.bytes() {
+                t.push_str(&format!("{b:X}"));
             }
-            ascii_hex.push(h);
+            ascii_hex.push(u64::from_str_radix(&t, 16).unwrap());
+            println!("token: {token}\thex: {t}\tdec: {}", u64::from_str_radix(&t, 16).unwrap());
         } else {
-            dec.push(i.parse::<u64>().unwrap());
+            println!("token: {token}\t\t\tdec: {token}");
+            dec.push(token.parse::<u64>().unwrap());
         }
     }
     (hex, ascii_hex, dec)
@@ -44,8 +49,11 @@ fn main() {
             process::exit(1);
         }
     );
-    let (hex, ascii_hex, dec) = split_contents(contents);
-    println!("{:?}\n{:?}\n{:?}", hex, ascii_hex, dec);
+    let (hex, ascii_hex, dec) = split_contents(&contents);
+    println!(
+        "\nsum = {}",
+        hex.iter().sum::<u64>() + ascii_hex.iter().sum::<u64>() + dec.iter().sum::<u64>()
+    )
 }
 
 // use std::{fs, io::Read, error::Error, process};
