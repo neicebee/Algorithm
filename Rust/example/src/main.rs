@@ -22,9 +22,27 @@
 //     println!("result: {}", result);
 // }
 
+// fn main() {
+//     let msg = "EOF";
+//     for b in msg.bytes() {
+//         println!("{b:x}");
+//     }
+// }
+
 fn main() {
-    let msg = "EOF";
-    for b in msg.bytes() {
-        println!("{b:x}");
+    let (mut i, mut sum) = (1, 0);
+    loop {
+        sum+=i;
+        i+=1;
+        if i<=100 { break; }
     }
 }
+
+// int main() {
+// 	int i = 1;
+// 	int sum = 0;
+// 	while(i<=100) {
+// 		sum+=i;
+// 		i++;
+// 	}
+// }

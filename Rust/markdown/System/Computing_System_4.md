@@ -155,5 +155,139 @@ C-Command : dest = comp;jump
 - 두 장치는 메모리 맵을 통해 컴퓨터와 통신함
   - 키보드 입력은 해당 메모리 맵에 저장되고, 스크린에 해당하는 메모리 위치에 값을 쓰면 그에 대응하는 스크린 위에 픽셀이 쓰여짐
 - **스크린**
-  - 
+  - 512x256의 흑백 픽셀로 구성
+  - 스크린 픽셀은 RAM[16384]부터 시작하는 8K 메모리 맵에 대응
+  - 각 열마다 32개의 16비트 단어로 표현됨
 - **키보드**
+  - RAM[24567]에 위치한 1단어 메모리 맵을 통해 키보드와 통신
+    - 실제 키보드가 눌릴 때마다, 눌린 키의 16비트 ASCII 코드가 기록되는 식
+    - 키가 눌리지 않는 동안에는 0이 기록됨
+
+<br>
+
+## 🤔 명령어 예시
+
+```c
+int main() {
+	int i = 1;
+	int sum = 0;
+	while(i<=100) {
+		sum+=i;
+		i++;
+	}
+}
+```
+- C언어의 1..100 덧셈
+
+```assembly
+	@i		// i는 어떤 메모리 위치를 참조함
+	M=1		// i=1
+	@sum	// sum은 어떤 메모리 위치를 참조함
+	M=0		// sum=0
+(LOOP)
+	@i
+	D=M		// D=i
+	@100
+	D=D-A	// D=i-100
+	@END
+	D;JGT	// if(i-100)>0 goto END
+	@i
+	D=M		// D=i
+	@sum
+	M=D+M	// sum=sum+i
+	@i
+	M=M+1	// i=i+1
+	@LOOP
+	0;JMP	// goto LOOP
+(END)
+	@END
+	0;JMP	// 무한루프(남은 실행 횟수 소모)
+```
+- 기계어의 1..100 덧셈
+
+<br>
+
+## 🤔 곱셈 프로그램(Mult.asm)
+
+```asm
+// Multiplies R0 and R1 and stores the result in R2.
+// (R0, R1, R2 refer to RAM[0], RAM[1], and RAM[2], respectively.)
+//
+// This program only needs to handle arguments that satisfy
+// R0 >= 0, R1 >= 0, and R0*R1 < 32768.
+
+	@2
+	M=0		// R2를 0으로 초기화. R2에는 결과값 저장
+(LOOP)
+	@0
+	D=M		// R0의 값을 D에 저장. R0은 몇번 곱할지 남은 횟수를 나타냄
+	@END
+	D;JEQ	// D의 값이 0이 되었다면 계산 종료
+	@1
+	D=M		// R1의 값을 D에 저장
+	@2
+	M=M+D	// R2+=D
+	@0
+	M=M-1	// 남은 곱셈 횟수 1 감소
+	@LOOP
+	0;JMP	// 무조건 LOOP로 점프
+(END)
+	@END
+	0;JMP
+```
+
+<br>
+
+## 🤔 I/O 조작 프로그램
+
+```asm
+// Runs an infinite loop that listens to the keyboard input.
+// When a key is pressed (any key), the program blackens the screen,
+// i.e. writes "black" in every pixel;
+// the screen should remain fully black as long as the key is pressed. 
+// When no key is pressed, the program clears the screen, i.e. writes
+// "white" in every pixel;
+// the screen should remain fully clear as long as no key is pressed.
+
+@i
+M=0		// i=0 초기화
+(LOOP)
+	@KBD
+	D=M		// 현재 키보드에 입력된 값을 D에 대입
+
+	@NOINPUT
+	D;JEQ	// D==0 jump
+	@INPUT
+	D;JGT	// D>0 jump
+
+(NOINPUT)
+	@16384
+	D=A
+	@i		// 현재 스크린 위치 -> A
+	D=D+M	// 16384+i(1)
+	A=D
+
+	M=0		// 현재 스크린 위치에 0000 0000 0000 0000 대입
+
+	@END
+	0;JMP
+
+(INPUT)
+	@16384
+	D=A
+	@i		// 현재 스크린 위치 -> A
+	D=D+M
+	A=D
+
+	M=-1	// 현재 스크린 위치에 1111 1111 1111 1111 대입
+
+	@END
+	0;JMP
+
+(END)
+	@i
+	M=M+1	// i=i+1
+
+	@LOOP
+	0;JMP	// LOOP로 jump
+```
