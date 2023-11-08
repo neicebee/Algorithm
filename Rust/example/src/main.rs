@@ -31,10 +31,9 @@
 
 fn main() {
     let (mut i, mut sum) = (1, 0);
-    loop {
+    while i<=100 {
         sum+=i;
         i+=1;
-        if i<=100 { break; }
     }
 }
 

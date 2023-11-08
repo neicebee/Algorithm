@@ -167,17 +167,16 @@ C-Command : dest = comp;jump
 
 ## 🤔 명령어 예시
 
-```c
-int main() {
-	int i = 1;
-	int sum = 0;
-	while(i<=100) {
-		sum+=i;
-		i++;
-	}
+```rust
+fn main() {
+    let (mut i, mut sum) = (1, 0);
+    while i<=100 {
+        sum+=i;
+        i+=1;
+    }
 }
 ```
-- C언어의 1..100 덧셈
+- Rust의 1..100 덧셈
 
 ```assembly
 	@i		// i는 어떤 메모리 위치를 참조함
