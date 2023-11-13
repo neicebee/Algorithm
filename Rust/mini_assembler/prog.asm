@@ -13,7 +13,7 @@
     @i
     D=M     // D=i
     @sum
-    M=D+M   // sum=sum+if
+    M=D+M   // sum=i+sum
     @i
     M=M+1   // i=i+1
     @LOOP
