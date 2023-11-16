@@ -1,38 +1,39 @@
-// use std::fmt::Display;
+use std::{thread, time::Duration};
 
-// fn longest_with_an_announcement<'a, T>(x: &'a str, y: &'a str, ann: T) -> &'a str 
-//     where T: Display
-// {
-//     println!("Attention! {}", ann);
-//     if x.len() > y.len() {
-//         x
-//     } else {
-//         y
-//     }
-// }
+fn simulated_expensive_calculation(intensity: u32) -> u32 {
+    println!("시간이 오래 걸리는 계산을 수행 중...");
+    thread::sleep(Duration::from_secs(2));
+    intensity
+}
 
-// fn main() {
-//     let msg1 = String::from("abcd");
-//     let msg2 = String::from("xyz");
-
-//     let result = longest_with_an_announcement(
-//         msg1.as_str(), msg2.as_str(), "Everyone!!"
-//     );
-
-//     println!("result: {}", result);
-// }
-
-// fn main() {
-//     let msg = "EOF";
-//     for b in msg.bytes() {
-//         println!("{b:x}");
-//     }
-// }
+fn generate_workout(intensity: u32, random_number: u32) {
+    if intensity < 25 {
+        println!(
+            "오늘은 {}번의 팔굽혀펴기를 하세요!",
+            simulated_expensive_calculation(intensity)
+        );
+        println!(
+            "다음에는 {}번의 윗몸 일으키기를 하세요!",
+            simulated_expensive_calculation(intensity)
+        );
+    } else {
+        if random_number == 3 {
+            println!("오늘은 수분을 충분히 섭취하며 쉬세요!");
+        } else {
+            println!(
+                "오늘은 {}분간 달리기를 하세요!",
+                simulated_expensive_calculation(intensity)
+            );
+        }
+    }
+}
 
 fn main() {
-    let (mut i, mut sum) = (1, 0);
-    while i<=100 {
-        sum+=i;
-        i+=1;
-    }
+    let simulated_user_specified_value = 10;
+    let simulated_random_number = 7;
+
+    generate_workout(
+        simulated_user_specified_value,
+        simulated_random_number
+    );
 }
