@@ -9,7 +9,13 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(args: &[String]) -> Result<Config, &'static str> {
+    pub fn new(mut args: std::env::Args) -> Result<Config, &'static str> {
+        args.next();
+
+        let query = match args.next() {
+            Some(arg) => arg,
+            None => return Err("검색어를 지정해야 합니다."),
+        };
         if args.len() < 3 {
             return Err("필요한 인수가 지정되지 않았습니다.");
         }
