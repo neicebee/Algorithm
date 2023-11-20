@@ -1,4 +1,5 @@
 use std::{io::Read, fs, error::Error, process};
+use std::fmt::Debug;
 
 const A: char =  '@';
 const LABEL: [char; 2] = ['(', ')'];
@@ -15,6 +16,12 @@ enum Command {
 struct Cmds {
     kind: Command,
     content: String,
+}
+
+struct C_Command<'a> {
+    dest: &'a str,
+    comp: &'a str,
+    jump: &'a str,
 }
 
 fn read_file(file_name: &str) -> Result<String, Box<dyn Error>>{
@@ -43,22 +50,36 @@ fn command_type(cmd: &str) -> Cmds {
     }
 }
 
-fn c_field(i: String) {
+fn c_field<'a>(i: &'a String) -> Option<C_Command<'a>> {
     let (mut d, mut j) = (0, 0);
     if i.contains('=') { d+=1; }
     if i.contains(';') { j+=1; }
     match (d, j) {
         (1, 0) => {
-            let mut t: Vec<&str> = i.split('=').collect();
-            println!("{:?}", t);
+            let mut it = i.split('=');
+            Some(C_Command {
+                dest: it.next().unwrap(),
+                comp: it.next().unwrap(),
+                jump: "",
+            })
         },
         (0, 1) => {
-            let mut t = i.split(';');
+            let mut it = i.split(';');
+            Some(C_Command {
+                dest: "",
+                comp: it.next().unwrap(),
+                jump: it.next().unwrap(),
+            })
         },
         (1, 1) => {
-            let mut t = i.split(['=', ';']);
+            let mut it = i.split(['=', ';']);
+            Some(C_Command {
+                dest: it.next().unwrap(),
+                comp: it.next().unwrap(),
+                jump: it.next().unwrap(),
+            })
         },
-        _ => panic!("C-command Error"),
+        _ => None,
     }
 }
 
@@ -82,7 +103,7 @@ fn main() {
         }
 
         if c.kind == Command::C {
-            c_field(c.content);
+            let result = c_field(&c.content);
         }
     }
 }

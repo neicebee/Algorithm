@@ -11,18 +11,22 @@ pub struct Config {
 impl Config {
     pub fn new(mut args: std::env::Args) -> Result<Config, &'static str> {
         args.next();
-
-        let query = match args.next() {
-            Some(arg) => arg,
-            None => return Err("검색어를 지정해야 합니다."),
-        };
-        if args.len() < 3 {
-            return Err("필요한 인수가 지정되지 않았습니다.");
-        }
         Ok(Config {
-            query: args[1].clone(),
-            filename: args[2].clone(),
-            case_sensitive: env::var("CASE_INSENSITIVE").is_err()
+            query: {
+                match args.next() {
+                    Some(arg) => arg,
+                    None => return Err("검색어를 지정해야 합니다."),
+                }
+            },
+            filename: {
+                match args.next() {
+                    Some(arg) => arg,
+                    None => return Err("파일명을 지정해야 합니다."),
+                }
+            },
+            case_sensitive: {
+                env::var("CASE_INSENSITIVE").is_err()
+            },
         })
     }
 }
@@ -46,24 +50,15 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 }
 
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    let mut v = vec![];
-    for l in contents.lines() {
-        if l.contains(query) {
-            v.push(l);
-        }
-    }
-    v
+    contents.lines()
+        .filter(|l| l.contains(query))
+        .collect()
 }
 
 pub fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    let query = query.to_lowercase();
-    let mut v = vec![];
-    for l in contents.lines() {
-        if l.to_lowercase().contains(&query) {
-            v.push(l);
-        }
-    }
-    v
+    contents.lines()
+        .filter(|l| l.to_lowercase().contains(&query.to_lowercase()))
+        .collect()
 }
 
 #[cfg(test)]

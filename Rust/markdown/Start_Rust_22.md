@@ -586,3 +586,106 @@ impl Config {
 
 #### **🤔 인덱스 대신 Iterator 트레이트의 메서드 활용하기**
 
+```rust
+impl Config {
+    pub fn new(mut args: std::env::Args) -> Result<Config, &'static str> {
+        args.next();
+        Ok(Config {
+            query: {
+                match args.next() {
+                    Some(arg) => arg,
+                    None => return Err("검색어를 지정해야 합니다."),
+                }
+            },
+            filename: {
+                match args.next() {
+                    Some(arg) => arg,
+                    None => return Err("파일명을 지정해야 합니다."),
+                }
+            },
+            case_sensitive: {
+                env::var("CASE_INSENSITIVE").is_err()
+            },
+        })
+    }
+}
+```
+- 반복자 메서드를 사용하도록 수정한 Config::new 함수
+- env::args 함수가 리턴하는 값의 첫 번째는 프로그램의 이름
+  - 이 값은 무시
+
+<br>
+
+#### **🤔 반복자 어댑터를 이용해 더 깔끔한 코드 작성하기**
+
+```rust
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    let mut v = vec![];
+    for l in contents.lines() {
+        if l.contains(query) {
+            v.push(l);
+        }
+    }
+    v
+}
+```
+- 기존의 search 함수
+
+```rust
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    contents.lines()
+        .filter(|l| l.contains(query))
+        .collect()
+}
+```
+- 반복자 어댑터를 이용해 다시 구현한 search 함수
+- 함수형 프로그래밍은 가변 상태의 양을 최소화해서 코드를 더 깔끔하게 유지하는 데 도움이 됨
+  - 가변 상태를 제거하면 중간값을 저장할 벡터를 사용할 필요가 없어져서 나중에 검색의 병렬 실행을 지원하기도 유리함
+
+```rust
+pub fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    contents.lines()
+        .filter(|l| l.to_lowercase().contains(&query.to_lowercase()))
+        .collect()
+}
+```
+- 같은 방식으로 다시 구현한 search_case_insensitive 함수
+
+<br>
+
+#### **🤔 루프와 반복자의 성능 비교**
+- 반복자가 고수준의 추상화를 제공하기는 하지만 직접 작성하는 저수준의 코드와 거의 같은 코드로 컴파일됨
+- 반복자는 러스트의 무비용 추상화(zero-cost abstractions) 기능 중 하나임
+  - 추상화를 사용한다고 추가적인 런타임 오버헤드가 발생하지 않음
+
+```rust
+fn main() {
+    let buf: &mut [i32];
+    let coefficients: [i64; 12];
+    let qlp_shift: i16;
+
+    for i in 12..buf.len() {
+        let prediction = coefficients.iter()
+            .zip(&buf[i-12..i])
+            .map(|(&c, &s)| c*s as i64)
+            .sum::<i64>() >> qlp_shift;
+        let delta = buf[i];
+        buf[i] = prediction as i32 + delta;
+    }
+}
+```
+- prediction 값을 계산하기 위해 coefficients 배열의 12개 값을 순회하면서 zip 메서드를 이용해 buf에 저장된 이전 12개 값을 이용해 값의 쌍을 만듬
+  - 각 쌍의 값들을 곱하고 그 결과를 모두 더해서 qlp_shift 변수에 지정된 비트만큼 오른쪽으로 이동함
+- 해당 코드는 개발자가 손으로 작성하는 것과 같은 어셈블리 코드로 컴파일됨
+  - coefficients 배열의 값을 순회하는 데 필요한 루프는 존재하지 않지만 러스트는 12개의 아이템을 순회해야 한다는 것을 알고 있으므로 루프를 풀어냄
+  - 여기서 풀어낸다는 것은 루프를 제어하는 코드의 오버헤드를 없애기 위해 루프를 제거하고 루프 안에서 실행되던 코드를 필요한 횟수만큼 반복하는 코드를 생성하는 과정을 뜻함
+- coefficients 배열의 모든 값들은 레지스터에 저장됨
+  - 값에 매우 빠르게 접근 가능
+  - 배열 접근 시 런타임에 경계값 검사도 실행하지 않음
+
+<br>
+
+## **Summary**
+- 클로저와 반복자는 함수형 프로그래밍 언어로부터 차용한 기능
+- 클로저와 반복자의 구현은 런타임 성능에 거의 영향을 미치지 않음
+  - 무비용 추상화를 달성하기 위한 노력의 일환
