@@ -18,7 +18,8 @@ struct Cmds {
     content: String,
 }
 
-struct C_Command<'a> {
+#[derive(Debug)]
+struct CCommand<'a> {
     dest: &'a str,
     comp: &'a str,
     jump: &'a str,
@@ -50,14 +51,14 @@ fn command_type(cmd: &str) -> Cmds {
     }
 }
 
-fn c_field<'a>(i: &'a String) -> Option<C_Command<'a>> {
+fn c_field<'a>(i: &'a String) -> Option<CCommand<'a>> {
     let (mut d, mut j) = (0, 0);
     if i.contains('=') { d+=1; }
     if i.contains(';') { j+=1; }
     match (d, j) {
         (1, 0) => {
             let mut it = i.split('=');
-            Some(C_Command {
+            Some(CCommand {
                 dest: it.next().unwrap(),
                 comp: it.next().unwrap(),
                 jump: "",
@@ -65,7 +66,7 @@ fn c_field<'a>(i: &'a String) -> Option<C_Command<'a>> {
         },
         (0, 1) => {
             let mut it = i.split(';');
-            Some(C_Command {
+            Some(CCommand {
                 dest: "",
                 comp: it.next().unwrap(),
                 jump: it.next().unwrap(),
@@ -73,7 +74,7 @@ fn c_field<'a>(i: &'a String) -> Option<C_Command<'a>> {
         },
         (1, 1) => {
             let mut it = i.split(['=', ';']);
-            Some(C_Command {
+            Some(CCommand {
                 dest: it.next().unwrap(),
                 comp: it.next().unwrap(),
                 jump: it.next().unwrap(),
@@ -81,6 +82,64 @@ fn c_field<'a>(i: &'a String) -> Option<C_Command<'a>> {
         },
         _ => None,
     }
+}
+
+fn code(c: &CCommand) {
+    let d = match c.dest {
+        "null0" => "000",
+        "M" => "001",
+        "D" => "010",
+        "MD" => "011",
+        "A" => "100",
+        "AM" => "101",
+        "AD" => "110",
+        "AMD" => "111",
+        _ => "",
+    };
+    let j = match c.jump {
+        "null" => "000",
+        "JGT" => "001",
+        "JEQ" => "010",
+        "JGE" => "011",
+        "JLT" => "100",
+        "JNE" => "101",
+        "JLE" => "110",
+        "JMP" => "111",
+        _ => "",
+    };
+    let c = match c.comp {
+        "0" => "0101010",
+        "1" => "0111111",
+        "-1" => "0111010",
+        "D" => "0001100",
+        "A" => "0110000",
+        "!D" => "0001101",
+        "!A" => "0110001",
+        "-D" => "0001111",
+        "-A" => "0110011",
+        "D+1" => "0011111",
+        "A+1" => "0110111",
+        "D-1" => "0001110",
+        "A-1" => "0110010",
+        "D+A" => "0000010",
+        "D-A" => "0010011",
+        "A-D" => "0000111",
+        "D&A" => "0000000",
+        "D|A" => "0010101",
+        "M" => "1110000",
+        "!M" => "1110001",
+        "-M" => "1110011",
+        "M+1" => "1110111",
+        "M-1" => "1110010",
+        "D+M" => "1000010",
+        "D-M" => "1010011",
+        "M-D" => "1000111",
+        "D&M" => "1000000",
+        "D|M" => "1010101",
+        _ => "",
+    };
+    let binary_code = format!("111{c}{d}{j}");
+    println!("{binary_code}");
 }
 
 fn main() {
@@ -93,7 +152,7 @@ fn main() {
 
     for l in contents.lines() {
         if l.find("//")==Some(0) { continue }
-        let mut c;
+        let c;
         if let Some(i) = l.find("//") {
             c = command_type(&l[..i].trim());
             println!("{:?}", c);
@@ -103,7 +162,10 @@ fn main() {
         }
 
         if c.kind == Command::C {
-            let result = c_field(&c.content);
+            if let Some(r) = c_field(&c.content) {
+                println!("{:?}", r);
+                code(&r);
+            }
         }
     }
 }
