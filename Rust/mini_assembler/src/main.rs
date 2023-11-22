@@ -1,8 +1,34 @@
-use std::{io::Read, fs, error::Error, process};
+use std::{io::Read, fs, error::Error, process, collections::HashMap};
 use std::fmt::Debug;
 
 const A: char =  '@';
 const LABEL: [char; 2] = ['(', ')'];
+const SYMBOL_TABLE: [(&str, i32); 23] = [
+    ("R0", 0), 
+    ("R1", 1), 
+    ("R2", 2), 
+    ("R3", 3), 
+    ("R4", 4), 
+    ("R5", 5), 
+    ("R6", 6), 
+    ("R7", 7), 
+    ("R8", 8), 
+    ("R9", 9), 
+    ("R10", 10), 
+    ("R11", 11), 
+    ("R12", 12), 
+    ("R13", 13), 
+    ("R14", 14), 
+    ("R15", 15), 
+
+    ("SCREEN", 16384), 
+    ("KBD", 24567), 
+    ("SP", 0), 
+    ("LCL", 1), 
+    ("ARG", 2), 
+    ("THIS", 3), 
+    ("THAT", 4)
+];
 
 #[derive(Debug)]
 #[derive(PartialEq)]
@@ -142,6 +168,10 @@ fn code(c: &CCommand) {
     println!("{binary_code}");
 }
 
+fn add_entry(st: &mut HashMap<&str, i32>, c: String) {
+    
+}
+
 fn main() {
     let contents = read_file("prog.asm").unwrap_or_else(
         |err| {
@@ -149,6 +179,8 @@ fn main() {
             process::exit(1);
         }
     );
+
+    let mut _symbol_table: HashMap<&str, i32> = HashMap::from(SYMBOL_TABLE);
 
     for l in contents.lines() {
         if l.find("//")==Some(0) { continue }
@@ -166,6 +198,10 @@ fn main() {
                 println!("{:?}", r);
                 code(&r);
             }
+        }
+
+        if c.kind == Command::A {
+            add_entry(&mut _symbol_table, c.content);
         }
     }
 }
