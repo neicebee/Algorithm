@@ -1,14 +1,33 @@
-/// 주어진 숫자에 1을 더한다.
-/// 
-/// # Examples
-/// 
-/// ```
-/// let arg = 5;
-/// let answer = my_crate::add_one(arg);
-/// 
-/// assert_eq!(6, answer);
-/// ```
+//! # Art
+//! 
+//! 미술품을 모델링하기 위한 라이브러리
 
-pub fn add_one(x: i32) -> i32 {
-    x+1
+pub use self::kinds::PrimaryColor;
+pub use self::kinds::SecondaryColor;
+pub use self::utils::mix;
+
+pub mod kinds {
+    /// RYB 색상 모델에 따른 주 색상
+    pub enum PrimaryColor {
+        Red,
+        Yellow,
+        Blue,
+    }
+
+    /// RYB 색상 모델에 따른 보조 색상
+    pub enum SecondaryColor {
+        Orange,
+        Green,
+        Purple,
+    }
+}
+
+pub mod utils {
+    use crate::kinds::*;
+
+    /// 두 개의 주 색상을 조합해서
+    /// 보조 색상을 생성한다.
+    pub fn mix(c1: PrimaryColor, c2: PrimaryColor) -> SecondaryColor {
+        // -- 생략 --
+    }
 }
