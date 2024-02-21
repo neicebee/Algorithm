@@ -218,9 +218,147 @@ impl<T> Deref for MyBox<T> {
 assert_eq!(5, *y);
 *(y.deref()); // *y 코드 도달 시 내부적 실행 코드
 ```
-- 러스트는 * 연산자를 deref 메서드 호출로 변환하고 역참조를 해석해서 개발자가 deref 메서드를 호출해야 하는지를 직접 결정하지 않도록 지원함
+- 러스트는 `*` 연산자를 deref 메서드 호출로 변환하고 역참조를 해석해서 개발자가 deref 메서드를 호출해야 하는지를 직접 결정하지 않도록 지원함
 - deref 메서드가 값에 대한 참조를 리턴하는 이유
   - 소유권 시스템이 `*(y.deref())` 구문에서 괄호 바깥의 역참조를 요구하기 때문
   - deref 메서드가 값의 참조가 아니라 값을 직접 리턴하면 리턴된 값이 self 참조로 이동함
-- 코드에서 * 연산자를 사용할 때마다 * 연산자는 deref 메서드 호출로 교체된 후 * 연산자를 한 번만 호출함
-  - 무한한 재귀호출이 아니므로 값을 얻게 됨
+- 코드에서 `*` 연산자를 사용할 때마다 `*` 연산자는 deref 메서드 호출로 교체된 후 `*` 연산자를 한 번만 호출함
+  - `*` 연산자 교체는 무한한 재귀호출이 아니므로 값을 얻게 됨
+
+<br>
+
+#### **🤔 함수와 메서드에 묵시적인 Deref 강제하기**
+- 역참조 강제(Deref coercion) : Deref 트레이트를 구현하는 타입의 참조를 Deref 트레이트가 변환하는 원래의 타입에 대한 참조로 변환함
+  - 특정 타입 값의 참조를 함수나 메서드의 인수로 전달할 때나 인수가 함수나 메서드의 매개변수 타입과 일치하지 않을 때 자동으로 처리됨
+  - 때문에 함수나 메서드 호출 시 &와 * 연산자를 이용해 명시적으로 참조나 역참조를 수행할 필요가 없음
+
+```rust
+fn hello(name: &str) {
+    println!("Hello, {name}!");
+}
+```
+- &str 타입의 매개변수 name을 사용하는 hello 함수
+
+```rust
+fn main() {
+    let msg = MyBox::new("World");
+    hello(&msg);
+}
+```
+- 역참조 강제를 이용해 hello 함수에 `MyBox<String>` 값의 참조를 전달
+  - deref 메서드를 호출하여 `&MyBox<String>` 을 `&String` 타입으로 변환
+  - 표준 라이브러리는 String 타입에 문자열 슬라이스를 리턴하는 Deref 트레이트를 구현하고 있음
+    - &String 타입의 deref 메서드를 다시 호출하여 &str 타입으로 변환
+
+```rust
+fn main() {
+    let msg = MyBox::new("World");
+    hello(&(*msg)[..]);
+}
+```
+- 러스트가 역참조 강제를 지원하지 않았으면 작성했어야 할 코드
+
+<br>
+
+#### **🤔 역참조 강제와 가변성**
+- Deref 트레이트 : 불변 참조에 대한 * 연산자의 동작을 재정의
+- DerefMut 트레이트 : 가변 참조에 대한 * 연산자의 동작을 재정의
+- `T: Deref<Target=U>` : &T를 &U로 변환
+  - 만일 &T 타입을 가진 경우 T가 어떤 타입 U를 위한 Deref 트레이트를 구현한다면 &U 참조에 대한 투명성을 가진다는 뜻
+- `T: DerefMut<Target=U>` : &mut T를 &mut U로 변환
+  - 가변 참조에 대해서는 같은 역참조 강제가 일어난다는 뜻
+- `T: Deref<Target=U>` : &mut T를 &U로 변환
+  - 가변 참조를 불변 참조로 강제 변환하는 것은 가능하지만 그 반대는 불가능함
+    - 대여 규칙 때문에 가변 참조는 반드시 어떤 데이터만을 참조해야 함
+    - 불변 참조를 가변 참조로 변환하려면 데이터에 대한 불변 참조가 단 하나뿐이어야 하는데 대여 규칙이 이를 보장하지 않음
+
+<br>
+
+### **3️⃣ Drop 트레이트를 구현해서 메모리를 해제할 때 코드 실행하기**
+- Drop 트레이트는 값이 범위를 벗어날 때의 동작을 재정의
+  - 어떤 타입에도 구현 가능하며 파일이나 네트워크 연결 같은 자원을 해제하는 코드를 명시할 수 있음
+  - 스마트 포인터를 구현할 때는 거의 항상 Drop 트레이트의 기능을 사용
+- 러스트는 값이 범위를 벗어날 때 호출되는 코드를 직접 명시할 수도 있고 컴파일러가 자동으로 코드를 삽입할 수도 있음
+  - 특정 타입의 사용을 마칠 때마다 매번 자원을 해제하는 코드를 주의해서 삽입할 필요가 없음
+  - **자원의 누수는 절대 발생하지 않음**
+- Drop 트레이트는 self의 가변 참조를 전달받는 drop 메서드를 구현할 것을 요구함
+
+```rust
+struct CustomSmartPointer {
+    data: String,
+}
+
+impl Drop for CustomSmartPointer {
+    fn drop(&mut self) {
+        println!("CustomSmartPointer의 데이터 '{}'를 해제합니다.",
+            self.data);
+    }
+}
+
+fn main() {
+    let c = CustomSmartPointer{
+        data: String::from("My Data")
+    };
+    let d = CustomSmartPointer{
+        data: String::from("Your Data")
+    };
+    println!("CustomSmartPointer를 생성했습니다.");
+}
+// Result
+// CustomSmartPointer를 생성했습니다.
+// CustomSmartPointer의 데이터 'Your Data'를 해제합니다.
+// CustomSmartPointer의 데이터 'My Data'를 해제합니다.
+```
+- 자원 해제 코드를 실행하는 Drop 트레이트를 구현한 CustomSmartPointer 구조체
+- 인스턴스가 범위를 벗어나면 drop 메서드를 자동으로 호출해서 작성된 코드를 실행함
+  - 자원의 해제는 생성과 반대 순서로 이루어짐
+
+<br>
+
+#### **🤔 std::mem::drop 함수로 값을 미리 해제하기**
+- drop 함수의 자동 호출을 비활성화하기는 쉽지 않음
+  - 메모리의 해제를 자동으로 처리하기 위한 것이기 때문
+- 어떤 값을 미리 해제하고 싶을 경우
+  - 스마트 포인터를 이용해 락(lock)을 관리하는 때
+  - 같은 범위 내의 다른 코드가 락을 얻을 수 있도록 락을 가능한 빨리 해제하려는 경우
+  - 러스트는 Drop 트레이트의 drop 메서드를 직접 호출하는 것을 지원하지 않음
+  - 그 대신 값이 범위를 벗어나기 전에 해제하려면 std::mem::drop 함수를 호출해야 함
+
+```rust
+fn main() {
+    let c = CustomSmartPointer{
+        data: String::from("My Data")
+    };
+    println!("CustomSmartPointer를 생성했습니다.");
+    c.drop();
+    println!("CustomSmartPointer를 main 함수의 끝에 도달하기 전에 해제합니다.");
+}
+// Result
+// explicit use of destructor method
+```
+- 메모리를 일찍 해제하기 위해 Drop 트레이트의 drop 메서드를 직접 호출
+- drop 메서드를 직접 호출할 수 없다는 에러 발생
+- 소멸자(destructor) : 인스턴스를 해제하는 역할을 실행하는 함수
+  - 생성자와 비슷하며 러스트의 drop 함수는 소멸자의 종류 중 하나
+- drop 함수는 범위를 벗어날 경우 값을 해제하기 위해 자동으로 호출하므로 명시적 호출이 불가능함
+  - 이 동작을 허용하면 같은 값을 두 번 해제하려고 함
+
+```rust
+fn main() {
+    let c = CustomSmartPointer{
+        data: String::from("My Data")
+    };
+    println!("CustomSmartPointer를 생성했습니다.");
+    drop(c);
+    println!("CustomSmartPointer를 main 함수의 끝에 도달하기 전에 해제합니다.");
+}
+// Result
+// CustomSmartPointer를 생성했습니다.
+// CustomSmartPointer의 데이터 'My Data'를 해제합니다.
+// CustomSmartPointer를 main 함수의 끝에 도달하기 전에 해제합니다.
+```
+- 값이 범위를 벗어나기 전에 std::mem::drop 함수를 호출해서 값 해제
+
+<br>
+
+### **4️⃣ `Rc<T>`, 참조 카운터 스마트 포인터**
