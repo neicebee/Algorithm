@@ -1,19 +1,13 @@
-struct CustomSmartPointer {
-    data: String,
+enum List {
+    Cons(i32, Rc<List>),
+    Nil,
 }
 
-impl Drop for CustomSmartPointer {
-    fn drop(&mut self) {
-        println!("CustomSmartPointer의 데이터 '{}'를 해제합니다.",
-            self.data);
-    }
-}
+use List::{Cons, Nil};
+use std::rc::Rc;
 
 fn main() {
-    let c = CustomSmartPointer{
-        data: String::from("My Data")
-    };
-    println!("CustomSmartPointer를 생성했습니다.");
-    drop(c);
-    println!("CustomSmartPointer를 main 함수의 끝에 도달하기 전에 해제합니다.");
+    let a = Rc::new(Cons(5, Rc::new(Cons(10, Rc::new(Nil)))));
+    let b = Cons(3, Rc::clone(&a));
+    let c = Cons(4, Rc::clone(&a));
 }
