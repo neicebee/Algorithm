@@ -507,3 +507,115 @@ fn main() {
 <br>
 
 **(1)** 내부 가변성의 활용 예: 모조 객체
+- 테스트 더블(test double) : 테스트 과정에서 어떤 타입의 역할을 대신하는 타입을 일컫는 프로그래밍 용어
+- 모조 객체(Mock objects) : 테스트 더블의 구체적인 형태 중 하나로 테스트 중 일어났던 일들을 기록해서 의도했던 동작이 이루어졌는지를 확인하기 위한 용도로 사용하는 객체
+- 어떤 값이 최댓값에 도달하는지를 추적하여 현재 값이 최댓값에 가까워지면 메시지를 보내는 라이브러리 구현
+
+```rust
+pub trait Messenger {
+    fn send(&self, msg: &str);
+}
+
+pub struct LimitTracker<'a, T: 'a + Messenger> {
+    messenger: &'a T,
+    value: usize,
+    max: usize,
+}
+
+impl<'a, T> LimitTracker<'a, T> where T: Messenger {
+    pub fn new(messenger: &T, max: usize) -> LimitTracker<T> {
+        LimitTracker {
+            messenger,
+            value: 0,
+            max,
+        }
+    }
+
+    pub fn set_value(&mut self, value: usize) {
+        self.value = value;
+        let percentage_of_max = self.value as f64 / self.max as f64;
+        if percentage_of_max >= 0.75 && percentage_of_max < 0.9 {
+            self.messenger.send("경고: 최댓값의 75%를 사용했습니다.");
+        } else if percentage_of_max >= 0.9 && percentage_of_max < 1.0 {
+            self.messenger.send("긴급 경고: 최댓값의 90%를 사용했습니다.");
+        } else if percentage_of_max >= 1.0 {
+            self.messenger.send("에러: 최댓값을 초과했습니다.");
+        }
+    }
+}
+```
+- 이 트레이트는 모조 객체가 구현해야 할 인터페이스
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+    struct MockMessenger {
+        sent_messages: Vec<String>,
+    }
+
+    impl MockMessenger {
+        fn new() -> MockMessenger {
+            MockMessenger { sent_messages: vec![] }
+        }
+    }
+
+    impl Messenger for MockMessenger {
+        fn send(&self, message: &str) {
+            self.sent_messages.push(String::from(message));
+        }
+    }
+
+    #[test]
+    fn it_sends_an_over_75_percent_warning_message() {
+        let mock_messenger = MockMessenger::new();
+        let mut limit_tracker = LimitTracker::new(&mock_messenger, 100);
+        limit_tracker.set_value(80);
+        assert_eq!(mock_messenger.sent_messages.len(), 1);
+    }
+}
+// Result
+// cannot borrow `self.sent_messages` as mutable, as it is behind a `&` reference
+```
+- 모조 객체를 구현했지만 대여 검사기는 이 코드의 컴파일을 허용하지 않음
+  - send 메서드는 self에 대한 불변 참조를 인수로 전달받기 때문에 MockMessenger 인스턴스를 변경해서 메시지를 기록할 수 없음
+  - 이럴 경우 내부 가변성이 필요함
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::cell::RefCell;
+
+    struct MockMessenger {
+        sent_messages: RefCell<Vec<String>>,
+    }
+
+    impl MockMessenger {
+        fn new() -> MockMessenger {
+            MockMessenger { sent_messages: RefCell::new(vec![]) }
+        }
+    }
+
+    impl Messenger for MockMessenger {
+        fn send(&self, message: &str) {
+            self.sent_messages.borrow_mut().push(String::from(message));
+        }
+    }
+
+    #[test]
+    fn it_sends_an_over_75_percent_warning_message() {
+        let mock_messenger = MockMessenger::new();
+        let mut limit_tracker = LimitTracker::new(&mock_messenger, 100);
+        limit_tracker.set_value(80);
+        assert_eq!(mock_messenger.sent_messages.borrow().len(), 1);
+    }
+}
+```
+- `RefCell<T>` 를 이용해 타입을 불변으로 유지하면서도 내부의 값을 변경할 수 있도록 수정한 코드
+- `self.sent_messages` 필드의 `RefCell<Vec<String>>` 타입이 제공하는 borrow_mut 메서드를 호출하면 `RefCell<Vec<String>>` 안에 저장된 가변 참조인 벡터를 얻어올 수 있음
+  - 이 벡터의 가변 참조에서 push 메서드를 호출해서 테스트를 실행하는 동안 보내는 메시지를 기록할 수 있음
+
+<br>
+
+**(2)** `RefCell<T>` 를 이용해 런타임에 대여 검사하기
