@@ -619,3 +619,6 @@ mod tests {
 <br>
 
 **(2)** `RefCell<T>` 를 이용해 런타임에 대여 검사하기
+- 불변 참조 생성 : &
+- 가변 참조 생성 : &mut
+- `RefCell<T>` 사용 시 안전성 API에 해당하는 borrow와 borrow_mut 메서드 사용
