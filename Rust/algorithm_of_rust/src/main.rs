@@ -32,25 +32,42 @@
 //     }
 // }
 
-use std::{io, io::Read, error::Error};
+// use std::{io, io::Read, error::Error};
 
-fn main() -> Result<(), Box<dyn Error>>{
-    let mut buf = String::new();
-    io::stdin().read_to_string(&mut buf)?;
-    for l in buf.lines() {
-        if l=="-1" { break; }
-        let a = l.trim().parse::<u32>().unwrap();
-        let mut f: Vec<u32> = (1..=a).filter(|x| a%x==0).collect();
-        f.pop();
-        if a==f.iter().sum() {
-            println!("{a} = {}",
-                f.iter().map(
-                    |x| x.to_string()
-                ).collect::<Vec<String>>().join(" + ")
-            );
-        } else {
-            println!("{a} is NOT perfect.");
-        }
-    }
-    Ok(())
+// fn main() -> Result<(), Box<dyn Error>>{
+//     let mut buf = String::new();
+//     io::stdin().read_to_string(&mut buf)?;
+//     for l in buf.lines() {
+//         if l=="-1" { break; }
+//         let a = l.trim().parse::<u32>().unwrap();
+//         let mut f: Vec<u32> = (1..=a).filter(|x| a%x==0).collect();
+//         f.pop();
+//         if a==f.iter().sum() {
+//             println!("{a} = {}",
+//                 f.iter().map(
+//                     |x| x.to_string()
+//                 ).collect::<Vec<String>>().join(" + ")
+//             );
+//         } else {
+//             println!("{a} is NOT perfect.");
+//         }
+//     }
+//     Ok(())
+// }
+
+use std::io;
+use rand::Rng;
+
+fn main() {
+    println!("Guess the number!");
+    
+    let secret_number = rand::thread_rng().gen_range(1, 101);
+    println!("The number of player must guess: {}", secret_number);
+    println!("The number of player thinks.");
+    
+    let mut guess = String::new();
+    io::stdin().read_line(&mut guess)
+        .expect("Unable to read input!");
+    
+    println!("Input number: {}", guess);
 }
