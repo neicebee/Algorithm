@@ -113,6 +113,22 @@ plt.show()
         0 & 0 & 1 & 0 \\
         1 & 0 & 1 & 1
       \end{bmatrix}$
+- **3D Scaling Transformation**
+  - 점의 좌표를 동차 좌표로 확장 후, 배율 값을 포함하는 변환 행렬을 곱해서 계산
+    - 점 P'(2,1,1)
+      - $P'_{hom} = [2,1,1,1]$
+    - 크기 변환 행렬
+      - $\begin{bmatrix}
+        S_x & 0 & 0 & 0 \\
+        0 & S_y & 0 & 0 \\
+        0 & 0 & S_z & 0 \\
+        0 & 0 & 0 & 1
+      \end{bmatrix} = \begin{bmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 \\
+        0 & 0 & 2 & 0 \\
+        0 & 0 & 0 & 1
+      \end{bmatrix}$
 
 <br>
 
@@ -140,17 +156,30 @@ t_matrix = np.array([
     [0, 0, 1, 0],
     [tx, ty, tz, 1]
 ])
-print("\n이동 변환 행렬:")
-print(t_matrix)
 
 # 행렬 곱셈을 사용해서 점 P'의 동차 좌표 계산
 # 넘파이에서는 @ 연산자로 행렬 곱셈을 쉽게 할 수 있음
-new_hom = p_hom @ t_matrix
-print(f"\n점 P'의 동차 좌표: {new_hom}")
+p_hom = p_hom @ t_matrix
+print(f"\n점 P'의 동차 좌표: {p_hom}")
 
-# 점 P'의 동차 좌표를 다시 3차원 카티션 좌표로 변환
+# 배율 정의
+sx, sy, sz = 1, 1, 2
+print(f"\n배율: Sx={sx}, Sy={sy}, Sz={sz}")
+
+# 크기 변환 행렬
+s_matrix = np.array([
+    [sx, 0, 0, 0],
+    [0, sy, 0, 0],
+    [0, 0, sz, 0],
+    [0, 0, 0, 1]
+])
+
+# 행렬 곱셈을 사용해서 점 P''의 동차 좌표 계산
+new_hom = p_hom @ s_matrix
+print(f"\n점 P''의 동차 좌표: {new_hom}")
+
+# 점 P''의 동차 좌표를 다시 3차원 카티션 좌표로 변환
 # 동차 좌표 [x', y', z', w'] 에서 w'으로 각 성분을 나눠줌
-# 이동 변환의 경우 w'는 항상 1이기 때문에 실제 좌표 값은 변하지 않음
 w_prime = new_hom[3] # w'
 new_point_3d = new_hom[:3]/w_prime # [x'/w', y'/w', z'/w'] 계산
 print(f"\nP'의 3차원 좌표: {new_point_3d}")
@@ -160,15 +189,13 @@ print(f"\nP'의 3차원 좌표: {new_point_3d}")
     
     이동량: Tx=1, Ty=0, Tz=1
     
-    이동 변환 행렬:
-    [[1 0 0 0]
-     [0 1 0 0]
-     [0 0 1 0]
-     [1 0 1 1]]
-    
     점 P'의 동차 좌표: [2 1 1 1]
     
-    P'의 3차원 좌표: [2. 1. 1.]
+    배율: Sx=1, Sy=1, Sz=2
+    
+    점 P''의 동차 좌표: [2 1 2 1]
+    
+    P'의 3차원 좌표: [2. 1. 2.]
 
 
 
@@ -177,22 +204,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D # 3차원 그림을 위한 툴킷 불러오기
 
-# P와 P'의 3차원 좌표
-p = np.array([1, 1, 0])
-p_d = np.array([2, 1, 1]) # 위 계산 결과 사용
+# P와 P', P''의 3차원 좌표(위 계산 결과 사용)
+p = np.array([1,1,0])
+p2 = np.array([2,1,1])
+p3 = np.array([2,1,2])
 
 # 그림(figure)과 3차원 축(axes) 생성
 fig = plt.figure(figsize=(10, 8)) # 그림 크기 설정
 ax = fig.add_subplot(111, projection='3d') # 3차원 플롯 설정 (기본 RHS)
 
-# P와 P' 그리기
+# P와 P', P'' 그리기
 ax.scatter([p[0]], [p[1]], [p[2]], c='blue', marker='o', s=100, label='Original Point P(1,1,0)')
-ax.scatter([p_d[0]], [p_d[1]], [p_d[2]], c='red', marker='o', s=100, label='New Point P\'(2,1,1)')
+ax.scatter([p2[0]], [p2[1]], [p2[2]], c='red', marker='o', s=100, label='Point P\'(2,1,1)')
+ax.scatter([p3[0]], [p3[1]], [p3[2]], c='green', marker='o', s=100, label='Point P\'\'(2,1,2)')
 
 # 이동 벡터 그리기
-ax.plot([p[0], p_d[0]],
-        [p[1], p_d[1]],
-        [p[2], p_d[2]], color='gray', linestyle='--', label='Translation Vector')
+ax.plot([p[0], p2[0], p3[0]],
+        [p[1], p2[1], p3[1]],
+        [p[2], p2[2], p3[2]], color='gray', linestyle='--', label='Translation Vector')
 
 # 축 레이블 설정
 ax.set_xlabel('X-axis')
@@ -210,7 +239,7 @@ ax.grid(True)
 
 # 축 범위 설정 (두 점과 원점을 포함해서 잘 보이도록)
 # x, y, z 좌표들의 최소/최대 값을 찾아서 적절히 범위 지정
-all_coords = np.vstack((p, p_d, [0,0,0])) # 원점도 포함시켜서 범위 잡기
+all_coords = np.vstack((p, p2, p3, [0,0,0])) # 원점도 포함시켜서 범위 잡기
 max_range = np.array([all_coords[:,0].max() - all_coords[:,0].min(),
                       all_coords[:,1].max() - all_coords[:,1].min(),
                       all_coords[:,2].max() - all_coords[:,2].min()]).max() / 2.0
@@ -238,7 +267,7 @@ plt.show()
 <br>
 
 ## Problem 3
-- **어떤 3차원 모델에 대하여 한 점 $(1,0,0)$을 고정점으로 하고 z축을 회전축으로 하여 $+90\degree$만큼 회전시키고자 한다. 이 모델을 이루는 한 점 $P(0,1,1)$은 어떠한 좌표로 변환되는 지 계산하시오.(변환 행렬과 계산 결과 모두 제시)**
+- **어떤 3차원 모델에 대하여 한 점 $(1,0,0)$을 고정점으로 하고 z축을 회전축으로 하여 $+90\text 도$만큼 회전시키고자 한다. 이 모델을 이루는 한 점 $P(0,1,1)$은 어떠한 좌표로 변환되는 지 계산하시오.(변환 행렬과 계산 결과 모두 제시)**
 
 <br>
 
@@ -254,12 +283,12 @@ plt.show()
         -1 & 0 & 0 & 1
       \end{bmatrix}$
   - 전환된 점을 원점을 기준으로 z축을 회전축으로 회전
-    - $x'=x \cos\theta - y \sin\theta$
-    - $y'=x \sin\theta + y \cos\theta$
+    - $x'=x\,cos\theta - y\,sin\theta$
+    - $y'=x\,sin\theta + y\,cos\theta$
     - $z'=z$
-  - 행렬식($\theta = +90 \text 도 = \frac{\pi}{2}$)
-    - $\cos\frac{\pi}{2}=0$
-    - $\sin\frac{\pi}{2}=1$
+  - 행렬식($\theta = +90\degree = \frac{\pi}{2}$)
+    - $cos\,\frac{\pi}{2}=0$
+    - $sin\,\frac{\pi}{2}=1$
     - $\begin{bmatrix}
       \cos \theta & \sin \theta & 0 & 0 \\
       -\sin \theta & \cos \theta & 0 & 0 \\
